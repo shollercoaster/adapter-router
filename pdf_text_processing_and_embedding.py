@@ -14,7 +14,7 @@ ostep_pdf_path = "data/operating_systems_three_easy_pieces.pdf"
 
 def text_formatter(text: str) -> str:
     """Performs minor formatting on text."""
-    cleaned_text = text.replace("\n", " ").strip() # note: this might be different for each doc (best to experiment)
+    cleaned_text = text.replace("\n", " ").strip()
 
     # Other potential text formatting functions can go here
     return cleaned_text
@@ -52,7 +52,7 @@ pages_and_texts = open_and_read_pdf(pdf_path=ostep_pdf_path, start_page=38, end_
 def sentence_chunking_using_spacy(pages_and_texts: list[dict]) -> None:
     nlp = English()
 
-    # Add a sentencizer pipeline, see https://spacy.io/api/sentencizer/ 
+    # Add a sentencizer pipeline
     nlp.add_pipe("sentencizer")
 
     for item in tqdm(pages_and_texts):
@@ -73,7 +73,7 @@ def split_list(input_list: list, slice_size: int) -> list[list[str]]:
     """
     return [input_list[i:i + slice_size] for i in range(0, len(input_list), slice_size)]
 
-def merge_and_filter_chunks(num_sentence_chunk_size = 8, min_token_length = 30):
+def merge_and_filter_chunks(num_sentence_chunk_size: int=8, min_token_length: int=30) -> list[dict]:
     # Loop through pages and texts and split sentences into chunks
     for item in tqdm(pages_and_texts):
         item["sentence_chunks"] = split_list(input_list=item["sentences"],
@@ -106,11 +106,10 @@ def merge_and_filter_chunks(num_sentence_chunk_size = 8, min_token_length = 30):
     pages_and_chunks_over_min_token_len[:2]
     return pages_and_chunks_over_min_token_len
 
-def embedding_text_chunks():
+def embedding_text_chunks(pages_and_chunks_over_min_token_len: list[dict]) -> None:
     embedding_model = SentenceTransformer(model_name_or_path="nvidia/NV-Embed-v2", 
                                       trust_remote_code=True,
                                       device="cuda")
-    pages_and_chunks_over_min_token_len = merge_and_filter_chunks(num_sentence_chunk_size = 8, min_token_length = 30)
 
     for item in tqdm(pages_and_chunks_over_min_token_len):
         item["embedding"] = embedding_model.encode(item["sentence_chunk"])
@@ -120,4 +119,5 @@ def embedding_text_chunks():
     embeddings_df_save_path = "text_chunks_and_embeddings_df.csv"
     text_chunks_and_embeddings_df.to_csv(embeddings_df_save_path, index=False)
 
-embedding_text_chunks()
+pages_and_chunks_over_min_token_len = merge_and_filter_chunks(num_sentence_chunk_size=8, min_token_length=30)
+embedding_text_chunks(pages_and_chunks_over_min_token_len)
