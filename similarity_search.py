@@ -8,7 +8,7 @@ import timer
 import torch.nn.functional.cosine_similarity as cosine_similarity
 
 # Load embedding model
-embedding_model = SentenceTransformer(model_name_or_path="nvidia/NV-Embed-v2", 
+embedding_model = SentenceTransformer(model_name_or_path="dunzhang/stella_en_1.5B_v5",  
                                     trust_remote_code=True,
                                     device="cuda")
 
@@ -41,7 +41,9 @@ def retrieve_relevant_resources(query: str,
     """
 
     # Embed the query
+    query_prompt_name = "s2p_query"
     query_embedding = model.encode(query,
+                                   prompt_name=query_prompt_name,
                                    convert_to_tensor=True)
 
     # Get dot product or cosine_similarity scores on embeddings
