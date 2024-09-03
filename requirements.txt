@@ -1,6 +1,6 @@
 PyMuPDF
 tqdm 
-torch==2.2.0
+flash-attn
 transformers==4.42.4
 sentence-transformers==2.7.0
 datasets

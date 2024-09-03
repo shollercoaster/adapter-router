@@ -107,7 +107,7 @@ def merge_and_filter_chunks(num_sentence_chunk_size: int=8, min_token_length: in
     return pages_and_chunks_over_min_token_len
 
 def embedding_text_chunks(pages_and_chunks_over_min_token_len: list[dict]) -> None:
-    embedding_model = SentenceTransformer(model_name_or_path="nvidia/NV-Embed-v2", 
+    embedding_model = SentenceTransformer(model_name_or_path="dunzhang/stella_en_1.5B_v5", 
                                       trust_remote_code=True,
                                       device="cuda")
 
