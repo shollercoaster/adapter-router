@@ -116,7 +116,7 @@ def embedding_text_chunks(pages_and_chunks_over_min_token_len: list[dict]) -> No
 
     # Save embeddings to file
     text_chunks_and_embeddings_df = pd.DataFrame(pages_and_chunks_over_min_token_len)
-    embeddings_df_save_path = "text_chunks_and_embeddings_df.csv"
+    embeddings_df_save_path = "ostep_text_chunks_and_embeddings_df.csv"
     text_chunks_and_embeddings_df.to_csv(embeddings_df_save_path, index=False)
 
 pages_and_chunks_over_min_token_len = merge_and_filter_chunks(num_sentence_chunk_size=8, min_token_length=30)
