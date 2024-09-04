@@ -111,21 +111,21 @@ def embedding_text_chunks(pages_and_chunks_over_min_token_len: list[dict]) -> No
                                       trust_remote_code=True,
                                       device="cuda")
     
-#    docs = [pages_and_chunks_over_min_token_len[i]["sentence_chunk"] for i in range(tqdm(pages_and_chunks_over_min_token_len))]
-#    embeddings = embedding_model.encode(docs)
-#    text_chunks = [item["sentence_chunk"] for item in pages_and_chunks_over_min_token_len]
     for item in tqdm(pages_and_chunks_over_min_token_len):
-        item["embedding"] = embedding_model.encode(item["sentence_chunk"])
-    print(len(item["embedding"]))
-    # Save embeddings to file
-    embeddings_df = pd.DataFrame(pages_and_chunks_over_min_token_len)
-    embeddings_df_save_path = "ostep_text_chunks_and_embeddings_df.csv"
-    embeddings_df.to_csv(embeddings_df_save_path, index=False)
-    return embeddings_df
+        embeddings = embedding_model.encode(item["sentence_chunk"])
+
+    return embeddings
 
 pages_and_chunks_over_min_token_len = merge_and_filter_chunks(num_sentence_chunk_size=16, min_token_length=30)
+ostep_embeddings = embedding_text_chunks(pages_and_chunks_over_min_token_len)
+
+# Save chunks df to file
+pages_and_chunks_embeddings_df = pd.DataFrame(pages_and_chunks_over_min_token_len)
+pages_and_chunks_embeddings_df_save_path = "ostep_text_chunks_and_embeddings_df.csv"
+pages_and_chunks_embeddings_df.to_csv(pages_and_chunks_embeddings_df_save_path, index=False)
+
 print(pages_and_chunks_over_min_token_len[0]["sentence_chunk"])
 print(type(pages_and_chunks_over_min_token_len[0]["sentence_chunk"]))
 
-embeddings_df = embedding_text_chunks(pages_and_chunks_over_min_token_len)
-print(embeddings_df["embeddings"].shape)
+
+print(embeddings_df.shape)

@@ -6,12 +6,14 @@ import numpy as np
 import pandas as pd
 import time
 
+from pdf_text_processing_and_embedding import ostep_embeddings
+
 # Load embedding model
 embedding_model = SentenceTransformer(model_name_or_path="dunzhang/stella_en_1.5B_v5",  
                                     trust_remote_code=True,
                                     device="cuda")
 
-def load_embeddings(embeddings_df_save_path: str) -> tuple:
+def load_embeddings(embeddings_df_save_path: str, embeddings: list) -> tuple:
     # Import text embeddings
     text_chunks_and_embedding_df = pd.read_csv(embeddings_df_save_path)
     print(text_chunks_and_embedding_df["embedding"][0])
@@ -25,12 +27,12 @@ def load_embeddings(embeddings_df_save_path: str) -> tuple:
     pages_and_chunks = text_chunks_and_embedding_df.to_dict(orient="records")
 
     # Convert embeddings to torch tensor and send to device (note: NumPy arrays are float64, torch tensors are float32 by default)
-    embeddings = torch.tensor(np.array(text_chunks_and_embedding_df["embedding"].tolist()), dtype=torch.float32).to("cuda")
+    embeddings = torch.tensor(np.array(embeddings.tolist()), dtype=torch.float32).to("cuda")
     
     return embeddings, pages_and_chunks
 
 embeddings_df_save_path = "ostep_text_chunks_and_embeddings_df.csv"
-embeddings, pages_and_chunks = load_embeddings(embeddings_df_save_path)
+embeddings, pages_and_chunks = load_embeddings(embeddings_df_save_path, ostep_embeddings)
 print(embeddings.shape)
 print(len(pages_and_chunks))
 def retrieve_relevant_resources(query: str,
@@ -47,11 +49,13 @@ def retrieve_relevant_resources(query: str,
                                    prompt_name=query_prompt_name,
                                    convert_to_tensor=True,
                                    device="cuda")
-    larger_embeddings = torch.randn(embeddings.shape[0], 1024).to("cuda")
+    
+    # embeddings = torch.randn(embeddings.shape[0], 1024).to("cuda")
+    
     # Get dot product or cosine_similarity scores on embeddings
     start_time = time.time()
     # cosine_similarity_scores = torch.nn.functional.cosine_similarity(query_embedding, embeddings)
-    dot_scores = util.dot_score(query_embedding, larger_embeddings)[0]
+    dot_scores = util.dot_score(query_embedding, embeddings)[0]
     end_time = time.time()
 
     print(f"[INFO] Time taken to get scores on {len(embeddings)} embeddings: {end_time-start_time:.5f} seconds.")
