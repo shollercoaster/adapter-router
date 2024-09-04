@@ -98,7 +98,7 @@ def merge_and_filter_chunks(num_sentence_chunk_size: int=8, min_token_length: in
             chunk_dict["chunk_token_count"] = len(joined_sentence_chunk) / 4 # 1 token = ~4 characters
             
             pages_and_chunks.append(chunk_dict)
-
+            print("How many chunks we have? ", len(pages_and_chunks))
     # Filtering chunks smaller than min_token_length
     df = pd.DataFrame(pages_and_chunks)
 
@@ -113,9 +113,10 @@ def embedding_text_chunks(pages_and_chunks_over_min_token_len: list[dict]) -> No
     
 #    docs = [pages_and_chunks_over_min_token_len[i]["sentence_chunk"] for i in range(tqdm(pages_and_chunks_over_min_token_len))]
 #    embeddings = embedding_model.encode(docs)
+#    text_chunks = [item["sentence_chunk"] for item in pages_and_chunks_over_min_token_len]
     for item in tqdm(pages_and_chunks_over_min_token_len):
         item["embedding"] = embedding_model.encode(item["sentence_chunk"])
-
+    print(len(item["embedding"]))
     # Save embeddings to file
     embeddings_df = pd.DataFrame(pages_and_chunks_over_min_token_len)
     embeddings_df_save_path = "ostep_text_chunks_and_embeddings_df.csv"
@@ -127,4 +128,4 @@ print(pages_and_chunks_over_min_token_len[0]["sentence_chunk"])
 print(type(pages_and_chunks_over_min_token_len[0]["sentence_chunk"]))
 
 embeddings_df = embedding_text_chunks(pages_and_chunks_over_min_token_len)
-print(embeddings_df.shape)
+print(embeddings_df["embeddings"].shape)

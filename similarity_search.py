@@ -20,7 +20,7 @@ def load_embeddings(embeddings_df_save_path: str) -> tuple:
     # Convert embedding column back to np.array (it got converted to string when it got saved to CSV)
     text_chunks_and_embedding_df["embedding"] = text_chunks_and_embedding_df["embedding"].apply(lambda x: np.fromstring(x.strip("[]"), sep=" "))
     print(text_chunks_and_embedding_df["embedding"].shape)
-
+    print(text_chunks_and_embedding_df["embedding"].iloc[0])
     # Convert texts and embedding df to list of dicts
     pages_and_chunks = text_chunks_and_embedding_df.to_dict(orient="records")
 
@@ -32,7 +32,7 @@ def load_embeddings(embeddings_df_save_path: str) -> tuple:
 embeddings_df_save_path = "ostep_text_chunks_and_embeddings_df.csv"
 embeddings, pages_and_chunks = load_embeddings(embeddings_df_save_path)
 print(embeddings.shape)
-
+print(len(pages_and_chunks))
 def retrieve_relevant_resources(query: str,
                                 embeddings: torch.tensor,
                                 model: SentenceTransformer=embedding_model,
@@ -47,11 +47,11 @@ def retrieve_relevant_resources(query: str,
                                    prompt_name=query_prompt_name,
                                    convert_to_tensor=True,
                                    device="cuda")
-
+    larger_embeddings = torch.randn(embeddings.shape[0], 1024).to("cuda")
     # Get dot product or cosine_similarity scores on embeddings
     start_time = time.time()
     # cosine_similarity_scores = torch.nn.functional.cosine_similarity(query_embedding, embeddings)
-    dot_scores = util.dot_score(query_embedding, embeddings)[0]
+    dot_scores = util.dot_score(query_embedding, larger_embeddings)[0]
     end_time = time.time()
 
     print(f"[INFO] Time taken to get scores on {len(embeddings)} embeddings: {end_time-start_time:.5f} seconds.")
@@ -84,7 +84,7 @@ def print_top_results_and_scores(query: str,
     # Loop through zipped together scores and indices
     for score, index in zip(scores, indices):
         print(f"Score: {score:.4f}")
-        # Print relevant sentence chunk (since the scores are in descending order, the most relevant chunk will be first)
+	# Print relevant sentence chunk (since the scores are in descending order, the most relevant chunk will be first)
         print_wrapped(pages_and_chunks[index]["sentence_chunk"])
         print(f"Page number: {pages_and_chunks[index]['page_number']}")
         print("\n")
