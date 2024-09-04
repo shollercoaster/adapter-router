@@ -10,19 +10,18 @@ from pdf_text_processing_and_embedding import ostep_embeddings
 
 # Load embedding model
 embedding_model = SentenceTransformer(model_name_or_path="dunzhang/stella_en_1.5B_v5",  
-                                    trust_remote_code=True,
-                                    device="cuda")
-
+                                    trust_remote_code=True).cuda()
+ostep_embeddings = torch.tensor(ostep_embeddings, dtype=torch.float32).to("cuda")
+print("device: ", ostep_embeddings.device)
 def load_embeddings(embeddings_df_save_path: str, embeddings: list) -> tuple:
     # Import text embeddings
     text_chunks_and_embedding_df = pd.read_csv(embeddings_df_save_path)
-    print(text_chunks_and_embedding_df["embedding"][0])
-    print(text_chunks_and_embedding_df["embedding"].shape)
+#    print(text_chunks_and_embedding_df["embedding"][0])
+#    print(text_chunks_and_embedding_df["embedding"].shape)
     
     # Convert embedding column back to np.array (it got converted to string when it got saved to CSV)
-    text_chunks_and_embedding_df["embedding"] = text_chunks_and_embedding_df["embedding"].apply(lambda x: np.fromstring(x.strip("[]"), sep=" "))
-    print(text_chunks_and_embedding_df["embedding"].shape)
-    print(text_chunks_and_embedding_df["embedding"].iloc[0])
+#    embeddings = embeddings.apply(lambda x: np.fromstring(x.strip("[]"), sep=" "))
+
     # Convert texts and embedding df to list of dicts
     pages_and_chunks = text_chunks_and_embedding_df.to_dict(orient="records")
 
@@ -33,29 +32,32 @@ def load_embeddings(embeddings_df_save_path: str, embeddings: list) -> tuple:
 
 embeddings_df_save_path = "ostep_text_chunks_and_embeddings_df.csv"
 embeddings, pages_and_chunks = load_embeddings(embeddings_df_save_path, ostep_embeddings)
-print(embeddings.shape)
-print(len(pages_and_chunks))
+print("shape of embeddings: ", embeddings.shape)
+# print(len(pages_and_chunks))
 def retrieve_relevant_resources(query: str,
                                 embeddings: torch.tensor,
                                 model: SentenceTransformer=embedding_model,
-                                n_resources_to_return: int=5):
+                                n_resources_to_return: int=1):
     """
     Embeds a query with model and returns top k scores and indices from embeddings.
     """
-
+    model.to("cuda")
+    embeddings = torch.tensor(embeddings, dtype=torch.float32).to("cuda")
     # Embed the query
     query_prompt_name = "s2p_query"
     query_embedding = model.encode(query,
                                    prompt_name=query_prompt_name,
-                                   convert_to_tensor=True,
-                                   device="cuda")
-    
+	                           device="cuda")
+    query_embedding =  torch.tensor(query_embedding, dtype=torch.float32).to("cuda")
+    print(query_embedding.shape, embeddings.shape)
     # embeddings = torch.randn(embeddings.shape[0], 1024).to("cuda")
-    
+    print(query_embedding.device, embeddings.device)
     # Get dot product or cosine_similarity scores on embeddings
     start_time = time.time()
     # cosine_similarity_scores = torch.nn.functional.cosine_similarity(query_embedding, embeddings)
-    dot_scores = util.dot_score(query_embedding, embeddings)[0]
+    dot_scores = util.dot_score(query_embedding, embeddings)
+    print(dot_scores)
+#    dot_scores = model.similarity(query_embedding, embeddings)
     end_time = time.time()
 
     print(f"[INFO] Time taken to get scores on {len(embeddings)} embeddings: {end_time-start_time:.5f} seconds.")
@@ -98,7 +100,7 @@ query = "How do operating systems use virtualization to manage memory"
 
 # Get just the scores and indices of top related results
 scores, indices = retrieve_relevant_resources(query=query,
-                                              embeddings=embeddings)
+                                              embeddings=ostep_embeddings)
 
 print_top_results_and_scores(query=query,
-                             embeddings=embeddings)
+                             embeddings=ostep_embeddings)

@@ -98,7 +98,7 @@ def merge_and_filter_chunks(num_sentence_chunk_size: int=8, min_token_length: in
             chunk_dict["chunk_token_count"] = len(joined_sentence_chunk) / 4 # 1 token = ~4 characters
             
             pages_and_chunks.append(chunk_dict)
-            print("How many chunks we have? ", len(pages_and_chunks))
+#            print("How many chunks we have? ", len(pages_and_chunks))
     # Filtering chunks smaller than min_token_length
     df = pd.DataFrame(pages_and_chunks)
 
@@ -128,4 +128,4 @@ print(pages_and_chunks_over_min_token_len[0]["sentence_chunk"])
 print(type(pages_and_chunks_over_min_token_len[0]["sentence_chunk"]))
 
 
-print(embeddings_df.shape)
+print(ostep_embeddings.shape)
