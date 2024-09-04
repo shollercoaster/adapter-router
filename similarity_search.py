@@ -16,15 +16,16 @@ def load_embeddings(embeddings_df_save_path: str) -> tuple:
     text_chunks_and_embedding_df = pd.read_csv(embeddings_df_save_path)
     print(text_chunks_and_embedding_df["embedding"][0])
     print(text_chunks_and_embedding_df["embedding"].shape)
-
-    # Convert embeddings to torch tensor and send to device (note: NumPy arrays are float64, torch tensors are float32 by default)
-    embeddings = torch.tensor(np.array(text_chunks_and_embedding_df["embedding"].tolist()), dtype=torch.float32).to("cuda")
-
+    
     # Convert embedding column back to np.array (it got converted to string when it got saved to CSV)
     text_chunks_and_embedding_df["embedding"] = text_chunks_and_embedding_df["embedding"].apply(lambda x: np.fromstring(x.strip("[]"), sep=" "))
+    print(text_chunks_and_embedding_df["embedding"].shape)
 
     # Convert texts and embedding df to list of dicts
     pages_and_chunks = text_chunks_and_embedding_df.to_dict(orient="records")
+
+    # Convert embeddings to torch tensor and send to device (note: NumPy arrays are float64, torch tensors are float32 by default)
+    embeddings = torch.tensor(np.array(text_chunks_and_embedding_df["embedding"].tolist()), dtype=torch.float32).to("cuda")
     
     return embeddings, pages_and_chunks
 
@@ -35,8 +36,7 @@ print(embeddings.shape)
 def retrieve_relevant_resources(query: str,
                                 embeddings: torch.tensor,
                                 model: SentenceTransformer=embedding_model,
-                                n_resources_to_return: int=5,
-                                print_time: bool=True):
+                                n_resources_to_return: int=5):
     """
     Embeds a query with model and returns top k scores and indices from embeddings.
     """
