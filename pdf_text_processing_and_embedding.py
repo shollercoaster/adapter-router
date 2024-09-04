@@ -98,7 +98,7 @@ def merge_and_filter_chunks(num_sentence_chunk_size: int=8, min_token_length: in
             chunk_dict["chunk_token_count"] = len(joined_sentence_chunk) / 4 # 1 token = ~4 characters
             
             pages_and_chunks.append(chunk_dict)
-#            print("How many chunks we have? ", len(pages_and_chunks))
+            
     # Filtering chunks smaller than min_token_length
     df = pd.DataFrame(pages_and_chunks)
 
@@ -107,17 +107,15 @@ def merge_and_filter_chunks(num_sentence_chunk_size: int=8, min_token_length: in
     return pages_and_chunks_over_min_token_len
 
 def embedding_text_chunks(pages_and_chunks_over_min_token_len: list[dict]) -> None:
-    embedding_model = SentenceTransformer(model_name_or_path="dunzhang/stella_en_1.5B_v5", 
+    embedding_model = SentenceTransformer(model_name_or_path="all-mpnet-base-v2", 
                                       trust_remote_code=True,
                                       device="cuda")
     
     for item in tqdm(pages_and_chunks_over_min_token_len):
-        embeddings = embedding_model.encode(item["sentence_chunk"])
-
-    return embeddings
+        item["embeddings"] = embedding_model.encode(item["sentence_chunk"])
 
 pages_and_chunks_over_min_token_len = merge_and_filter_chunks(num_sentence_chunk_size=16, min_token_length=30)
-ostep_embeddings = embedding_text_chunks(pages_and_chunks_over_min_token_len)
+embedding_text_chunks(pages_and_chunks_over_min_token_len)
 
 # Save chunks df to file
 pages_and_chunks_embeddings_df = pd.DataFrame(pages_and_chunks_over_min_token_len)
@@ -126,6 +124,3 @@ pages_and_chunks_embeddings_df.to_csv(pages_and_chunks_embeddings_df_save_path, 
 
 print(pages_and_chunks_over_min_token_len[0]["sentence_chunk"])
 print(type(pages_and_chunks_over_min_token_len[0]["sentence_chunk"]))
-
-
-print(ostep_embeddings.shape)
