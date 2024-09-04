@@ -4,8 +4,7 @@ import textwrap
 import torch
 import numpy as np
 import pandas as pd
-import timer
-import torch.nn.functional.cosine_similarity as cosine_similarity
+import time
 
 # Load embedding model
 embedding_model = SentenceTransformer(model_name_or_path="dunzhang/stella_en_1.5B_v5",  
@@ -15,13 +14,14 @@ embedding_model = SentenceTransformer(model_name_or_path="dunzhang/stella_en_1.5
 def load_embeddings(embeddings_df_save_path: str) -> tuple:
     # Import text embeddings
     text_chunks_and_embedding_df = pd.read_csv(embeddings_df_save_path)
-    device = "cuda" if torch.cuda.is_available() else "cpu"
-
+    device = "cuda"
+    print(text_chunks_and_embedding_df["embedding"][0])
+    print(text_chunks_and_embedding_df["embedding"].shape)
     # Convert embedding column back to np.array (it got converted to string when it got saved to CSV)
-    text_chunks_and_embedding_df["embedding"] = text_chunks_and_embedding_df["embedding"].apply(lambda x: np.fromstring(x.strip("[]"), sep=" "))
+    text_embedding_df["embedding"] = text_chunks_and_embedding_df["embedding"].apply(lambda x: np.fromstring(x.strip("[]"), sep=" "))
 
     # Convert texts and embedding df to list of dicts
-    pages_and_chunks = text_chunks_and_embedding_df.to_dict(orient="records")
+    pages_and_chunks = text_embedding_df.to_dict(orient="records")
 
     # Convert embeddings to torch tensor and send to device (note: NumPy arrays are float64, torch tensors are float32 by default)
     embeddings = torch.tensor(np.array(text_chunks_and_embedding_df["embedding"].tolist()), dtype=torch.float32).to(device)
@@ -30,7 +30,8 @@ def load_embeddings(embeddings_df_save_path: str) -> tuple:
 
 embeddings_df_save_path = "ostep_text_chunks_and_embeddings_df.csv"
 embeddings, pages_and_chunks = load_embeddings(embeddings_df_save_path)
-
+print(embeddings.shape)
+breakpoint()
 def retrieve_relevant_resources(query: str,
                                 embeddings: torch.tensor,
                                 model: SentenceTransformer=embedding_model,
@@ -44,19 +45,18 @@ def retrieve_relevant_resources(query: str,
     query_prompt_name = "s2p_query"
     query_embedding = model.encode(query,
                                    prompt_name=query_prompt_name,
-                                   convert_to_tensor=True)
+                                   convert_to_tensor=True,
+                                   device="cuda")
 
     # Get dot product or cosine_similarity scores on embeddings
-    start_time = timer()
-    cosine_similarity_scores = cosine_similarity(query_embedding, embeddings)
-    # dot_scores = util.dot_score(query_embedding, embeddings)[0]
-    end_time = timer()
+    start_time = time.time()
+    # cosine_similarity_scores = torch.nn.functional.cosine_similarity(query_embedding, embeddings)
+    dot_scores = util.dot_score(query_embedding, embeddings)[0]
+    end_time = time.time()
 
-    if print_time:
-        print(f"[INFO] Time taken to get scores on {len(embeddings)} embeddings: {end_time-start_time:.5f} seconds.")
+    print(f"[INFO] Time taken to get scores on {len(embeddings)} embeddings: {end_time-start_time:.5f} seconds.")
 
-    scores, indices = torch.topk(input=cosine_similarity_scores,
-                                # input=dot_scores,
+    scores, indices = torch.topk(input=dot_scores,
                                  k=n_resources_to_return)
 
     return scores, indices

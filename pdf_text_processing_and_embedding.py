@@ -110,14 +110,21 @@ def embedding_text_chunks(pages_and_chunks_over_min_token_len: list[dict]) -> No
     embedding_model = SentenceTransformer(model_name_or_path="dunzhang/stella_en_1.5B_v5", 
                                       trust_remote_code=True,
                                       device="cuda")
-
+    
+#    docs = [pages_and_chunks_over_min_token_len[i]["sentence_chunk"] for i in range(tqdm(pages_and_chunks_over_min_token_len))]
+#    embeddings = embedding_model.encode(docs)
     for item in tqdm(pages_and_chunks_over_min_token_len):
         item["embedding"] = embedding_model.encode(item["sentence_chunk"])
 
     # Save embeddings to file
-    text_chunks_and_embeddings_df = pd.DataFrame(pages_and_chunks_over_min_token_len)
+    embeddings_df = pd.DataFrame(pages_and_chunks_over_min_token_len)
     embeddings_df_save_path = "ostep_text_chunks_and_embeddings_df.csv"
-    text_chunks_and_embeddings_df.to_csv(embeddings_df_save_path, index=False)
+    embeddings_df.to_csv(embeddings_df_save_path, index=False)
+    return embeddings_df
 
-pages_and_chunks_over_min_token_len = merge_and_filter_chunks(num_sentence_chunk_size=8, min_token_length=30)
-embedding_text_chunks(pages_and_chunks_over_min_token_len)
+pages_and_chunks_over_min_token_len = merge_and_filter_chunks(num_sentence_chunk_size=16, min_token_length=30)
+print(pages_and_chunks_over_min_token_len[0]["sentence_chunk"])
+print(type(pages_and_chunks_over_min_token_len[0]["sentence_chunk"]))
+
+embeddings_df = embedding_text_chunks(pages_and_chunks_over_min_token_len)
+print(embeddings_df.shape)
