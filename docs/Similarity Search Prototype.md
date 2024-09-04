@@ -1,7 +1,7 @@
 # Prototype
 Created vector embeddings of textbook OSTEP (Operating Systems: Three Easy Pieces) using embedding model and got top 5 passages on finding cosine similarity for a specific query.
 # Model choices
-## mpnet_base_v2
+## [all-mpnet-base-v2](https://huggingface.co/sentence-transformers/all-mpnet-base-v2)
 - doesn't care about dimensions of query and document as long as chunked sentences don't cross model input dimensions (384 tokens). after encoding all embeddings are of size 768.
 - can perform both cosine_similarity and dot products (implemented by torch libraries)
 - better than top embedding models cause by using inbuilt similarity functions we can also get indices of topk results, allowing us to look at top k passages also. Didn't see similar functionality in other models.
