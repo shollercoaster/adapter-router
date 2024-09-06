@@ -130,7 +130,7 @@ def print_wrapped(text, wrap_length=80):
 embedding_csvs = [
     "embeddings/ostep_text_chunks_and_embeddings.csv",
     "embeddings/neural_network_text_chunks_and_embeddings.csv",
-#    "other_textbook_embeddings.csv"
+    "embeddings/algorithm_design_manual_text_chunks_and_embeddings.csv",
 ]
 
 # Load embeddings from multiple sources
@@ -138,7 +138,8 @@ all_embeddings = load_embeddings(embedding_csvs)
 
 # User query
 # query = "How do operating systems use virtualization to manage memory?"
-query = "Explain the Perceptron Algorithm."
+# query = "Explain the Perceptron Algorithm."
+query = "Create the smallest deterministic finite automaton M' such that M' behaves identically to M."
 
 # Retrieve top 5 passages from all textbooks
 top_results = retrieve_relevant_resources(query, all_embeddings, embedding_model, top_k=5)

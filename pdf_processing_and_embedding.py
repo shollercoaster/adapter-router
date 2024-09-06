@@ -167,5 +167,5 @@ def calculate_page_statistics(pages_and_texts: list[dict]) -> pd.DataFrame:
     return df
 
 # Example usage
-pages_and_texts = open_and_read_pdf("data/neural-network-learning-theoretical-foundations.pdf", start_page=15, end_page=370)
+pages_and_texts = open_and_read_pdf("data/algorithm-design-manual.pdf", start_page=14, end_page=665)
 df = calculate_page_statistics(pages_and_texts)
