@@ -1,0 +1,5 @@
+"How do operating systems use virtualization to manage memory?"
+"Explain the Perceptron Algorithm."
+"Create the smallest deterministic finite automaton M' such that M' behaves identically to M."
+"Write code for Prim's Algorithm."
+"How to find an inode in Log-structured File Systems?"

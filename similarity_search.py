@@ -136,13 +136,12 @@ embedding_csvs = [
 # Load embeddings from multiple sources
 all_embeddings = load_embeddings(embedding_csvs)
 
-# User query
-# query = "How do operating systems use virtualization to manage memory?"
-# query = "Explain the Perceptron Algorithm."
-query = "Create the smallest deterministic finite automaton M' such that M' behaves identically to M."
+with open("queries.txt", "r") as file:
+    queries = file.readlines()
 
-# Retrieve top 5 passages from all textbooks
-top_results = retrieve_relevant_resources(query, all_embeddings, embedding_model, top_k=1)
+for query in queries:
+    # Retrieve top 5 passages from all textbooks
+    top_results = retrieve_relevant_resources(query, all_embeddings, embedding_model, top_k=1)
 
-# Print the results
-print_top_results(query, top_results, top_k=5)
+    # Print the results
+    print_top_results(query, top_results, top_k=5)
