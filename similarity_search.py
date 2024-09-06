@@ -128,8 +128,8 @@ def print_wrapped(text, wrap_length=80):
 
 # List of CSV files containing embeddings from different textbooks
 embedding_csvs = [
-    "ostep_text_chunks_and_embeddings.csv",
-    "neural_network_text_chunks_and_embeddings.csv",
+    "embeddings/ostep_text_chunks_and_embeddings.csv",
+    "embeddings/neural_network_text_chunks_and_embeddings.csv",
 #    "other_textbook_embeddings.csv"
 ]
 
