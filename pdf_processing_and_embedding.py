@@ -134,3 +134,38 @@ def process_pdf_for_embeddings(pdf_path: str, start_page: int, end_page: int, nu
     df = pd.DataFrame(pages_and_chunks)
     df.to_csv(output_file, index=False)
     print(f"Embeddings saved to {output_file}")
+
+# Statistical Analysis 
+def calculate_page_statistics(pages_and_texts: list[dict]) -> pd.DataFrame:
+    """
+    Converts the list of page dictionaries to a DataFrame and calculates
+    average and minimum token and sentence counts across all pages.
+    
+    Parameters:
+        pages_and_texts (list[dict]): List of dictionaries containing page metadata and text.
+    
+    Returns:
+        pd.DataFrame: A DataFrame with the token and sentence statistics.
+    """
+    # Convert list of dicts to a DataFrame
+    df = pd.DataFrame(pages_and_texts)
+    
+    # Calculate average and minimum token count
+    avg_token_count = df["page_token_count"].mean()
+    min_token_count = df["page_token_count"].min()
+
+    # Calculate average and minimum sentence count
+    avg_sentence_count = df["page_sentence_count_raw"].mean()
+    min_sentence_count = df["page_sentence_count_raw"].min()
+
+    # Print statistics
+    print(f"Average Token Count per Page: {avg_token_count:.2f}")
+    print(f"Minimum Token Count per Page: {min_token_count}")
+    print(f"Average Sentence Count per Page: {avg_sentence_count:.2f}")
+    print(f"Minimum Sentence Count per Page: {min_sentence_count}")
+
+    return df
+
+# Example usage
+pages_and_texts = open_and_read_pdf("data/neural-network-learning-theoretical-foundations.pdf", start_page=15, end_page=370)
+df = calculate_page_statistics(pages_and_texts)

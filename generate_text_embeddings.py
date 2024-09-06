@@ -1,4 +1,4 @@
-\from cumulative_pdf_processing import process_pdf_for_embeddings
+from pdf_processing_and_embedding import process_pdf_for_embeddings
 
 # Embeddings for OSTEP
 process_pdf_for_embeddings(
