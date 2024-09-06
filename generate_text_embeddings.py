@@ -15,7 +15,7 @@ process_pdf_for_embeddings(
     pdf_path="data/neural-network-learning-theoretical-foundations.pdf", 
     start_page=15, 
     end_page=370,
-    num_sentence_chunk_size=4, 
+    num_sentence_chunk_size=8, 
     min_token_length=30, 
     output_file="embeddings/neural_network_text_chunks_and_embeddings.csv"
 )
