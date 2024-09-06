@@ -90,7 +90,7 @@ def retrieve_relevant_resources(query: str, all_embeddings: list[dict], model: S
     # Sort all results by score in descending order
     sorted_results = sorted(all_results, key=lambda x: x["score"], reverse=True)
 
-    return sorted_results[:top_k]
+    return sorted_results #[:top_k]
 
 def print_top_results(query: str, top_results: list[dict], top_k: int=5):
     """
@@ -104,7 +104,7 @@ def print_top_results(query: str, top_results: list[dict], top_k: int=5):
     print(f"Query: {query}\n")
     print("Top Results:\n")
 
-    for i, result in enumerate(top_results[:top_k]):
+    for i, result in enumerate(top_results): #[:top_k]):
         print(f"Result {i+1}:")
         print(f"Score: {result['score']:.4f}")
         print(f"Source: {result['source']}")
@@ -142,7 +142,7 @@ all_embeddings = load_embeddings(embedding_csvs)
 query = "Create the smallest deterministic finite automaton M' such that M' behaves identically to M."
 
 # Retrieve top 5 passages from all textbooks
-top_results = retrieve_relevant_resources(query, all_embeddings, embedding_model, top_k=5)
+top_results = retrieve_relevant_resources(query, all_embeddings, embedding_model, top_k=1)
 
 # Print the results
 print_top_results(query, top_results, top_k=5)
