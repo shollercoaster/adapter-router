@@ -8,7 +8,7 @@ import spacy, spacy_chunks
 
 # Initialize NLP model and sentence transformer globally
 nlp = English()
-# nlp.add_pipe('sentencizer')
+nlp.add_pipe("sentencizer")  # Add sentence segmentation capability
 embedding_model = SentenceTransformer("all-mpnet-base-v2", trust_remote_code=True, device="cuda")
 
 def text_formatter(text: str) -> str:
@@ -45,20 +45,33 @@ def open_and_read_pdf(pdf_path: str, start_page: int, end_page: int) -> list[dic
 
     return pages_and_texts
 
-def sentence_chunking(pages_and_texts: list[dict], chunk_size: int) -> None:
+def sentence_chunking(pages_and_texts: list[dict]) -> None:
     """
-    Splits text from each page into individual sentences using spaCy's NLP model with overlap in text chunks.
+    Splits text from each page into individual sentences using spaCy's NLP model.
+    
     Parameters:
         pages_and_texts (list[dict]): List of dictionaries containing page text.
-        chunk_size (int): Number of items in each chunk.
     """
-    if not nlp.has_pipe("spacy_chunks"):
-    	nlp.add_pipe("spacy_chunks", last=True, config={"chunking_method": "sentence", "chunk_size": chunk_size, "overlap": 2, "truncate": True})
-    # nlp.add_pipe('sentencizer')
     for item in pages_and_texts:
         doc = nlp(item["text"])  # Apply NLP pipeline to extract sentences
-        item["sentences"] = [str(sent) for sent in doc._.chunks]  # Convert sentences to strings
-    return item["sentences"]
+        item["sentences"] = [str(sent) for sent in doc.sents]  # Convert sentences to strings
+
+def split_list(input_list: list, chunk_size: int, overlap: int = 0) -> list[list[str]]:
+    """
+    Splits a list into smaller sublists of a given size.
+    Parameters:
+        input_list (list): List to be split.
+        chunk_size (int): Number of items in each chunk.
+        overlap (int): Number of items to overlap between consecutive chunks. 
+    Returns:
+        list[list]: List of sublists, each with up to chunk_size elements.
+    """
+    chunks = []
+    for i in range(0, len(input_list), chunk_size - overlap):
+        chunks.append(input_list[i:i + chunk_size])
+        if i + chunk_size >= len(input_list):
+            break  # Stop if there are not enough elements for another chunk
+    return chunks
 
 def merge_and_filter_chunks(pages_and_texts: list[dict], num_sentence_chunk_size: int, min_token_length: int) -> list[dict]:
     """
@@ -75,7 +88,7 @@ def merge_and_filter_chunks(pages_and_texts: list[dict], num_sentence_chunk_size
     pages_and_chunks = []
 
     for item in pages_and_texts:
-        sentence_chunks = sentence_chunking(pages_and_texts, num_sentence_chunk_size)  # Split sentences into chunks
+        sentence_chunks = split_list(item["sentences"], num_sentence_chunk_size, overlap=2)  # Split sentences into chunks with overlap
         
         for chunk in sentence_chunks:
             # Join sentences into a single string and clean up spacing
@@ -119,6 +132,7 @@ def process_pdf_for_embeddings(pdf_path: str, start_page: int, end_page: int, nu
         output_file (str): Path to the CSV file for saving results.
     """
     pages_and_texts = open_and_read_pdf(pdf_path, start_page, end_page)  # Extract text from PDF
+    sentence_chunking(pages_and_texts)  # Split text into sentences
     pages_and_chunks = merge_and_filter_chunks(pages_and_texts, num_sentence_chunk_size, min_token_length)  # Create and filter chunks
     embed_chunks(pages_and_chunks)  # Generate embeddings for each chunk
 
