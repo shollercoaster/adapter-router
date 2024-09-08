@@ -4,9 +4,11 @@ import re
 import fitz
 from tqdm.auto import tqdm
 from spacy.lang.en import English
+import spacy, spacy_chunks
 
 # Initialize NLP model and sentence transformer globally
 nlp = English()
+# nlp.add_pipe('sentencizer')
 embedding_model = SentenceTransformer("all-mpnet-base-v2", trust_remote_code=True, device="cuda")
 
 def text_formatter(text: str) -> str:
@@ -50,16 +52,12 @@ def sentence_chunking(pages_and_texts: list[dict], chunk_size: int) -> None:
         pages_and_texts (list[dict]): List of dictionaries containing page text.
         chunk_size (int): Number of items in each chunk.
     """
-    nlp.add_pipe("spacy_chunks", last=True, config={
-        "chunking_method": "sentence",
-        "chunk_size": chunk_size,
-        "overlap": 2, 
-        "truncate": True # whether to remove incomplete chunks at the end
-    })
-
+    if not nlp.has_pipe("spacy_chunks"):
+    	nlp.add_pipe("spacy_chunks", last=True, config={"chunking_method": "sentence", "chunk_size": chunk_size, "overlap": 2, "truncate": True})
+    # nlp.add_pipe('sentencizer')
     for item in pages_and_texts:
         doc = nlp(item["text"])  # Apply NLP pipeline to extract sentences
-        item["sentences"] = [str(sent) for sent in doc.sents]  # Convert sentences to strings
+        item["sentences"] = [str(sent) for sent in doc._.chunks]  # Convert sentences to strings
     return item["sentences"]
 
 def merge_and_filter_chunks(pages_and_texts: list[dict], num_sentence_chunk_size: int, min_token_length: int) -> list[dict]:
