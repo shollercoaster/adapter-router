@@ -27,7 +27,7 @@ process_pdf_for_embeddings(
     pdf_path="data/algorithm-design-manual.pdf", 
     start_page=14, 
     end_page=665,
-    num_sentence_chunk_size=10, 
+    num_sentence_chunk_size=8, 
     min_token_length=40,
     output_file="embeddings/algorithm_design_manual_text_chunks_and_embeddings.csv"
 )
@@ -37,7 +37,7 @@ process_pdf_for_embeddings(
     pdf_path="data/mind-body-world-cog-sci.pdf", 
     start_page=16, 
     end_page=440,
-    num_sentence_chunk_size=10, 
+    num_sentence_chunk_size=8, 
     min_token_length=40,
-    output_file="embeddings/algorithm_design_manual_text_chunks_and_embeddings.csv"
+    output_file="embeddings/cog_sci_foundations_text_chunks_and_embeddings.csv"
 )

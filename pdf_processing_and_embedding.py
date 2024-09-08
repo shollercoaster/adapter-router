@@ -4,7 +4,7 @@ import re
 import fitz
 from tqdm.auto import tqdm
 from spacy.lang.en import English
-import spacy, spacy_chunks
+import time
 
 # Initialize NLP model and sentence transformer globally
 nlp = English()
@@ -115,9 +115,15 @@ def embed_chunks(pages_and_chunks: list[dict]) -> None:
     Parameters:
         pages_and_chunks (list[dict]): List of text chunks for embedding.
     """
+    start_time = time.time()
+
     for item in tqdm(pages_and_chunks):
         # Generate and store the embedding for each chunk of text
         item["embeddings"] = embedding_model.encode(item["sentence_chunk"])
+
+    end_time = time.time()
+    
+    print(f"[INFO] Time taken to generate document embeddings: {end_time-start_time:.5f} seconds.")
 
 def process_pdf_for_embeddings(pdf_path: str, start_page: int, end_page: int, num_sentence_chunk_size: int, min_token_length: int, output_file: str) -> None:
     """
