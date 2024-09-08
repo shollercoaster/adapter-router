@@ -1,0 +1,117 @@
+Cosine Similarity Scores on keyword queries from 4 books
+No Overlap
+
+Query: "Shortest Job First (SJF) scheduling algorithm"
+
+Top Result:
+Score: 0.8077
+Source: ostep_text_chunks_and_embeddings.csv
+Page Number: 60
+Passage: 62 SCHEDULING: INTRODUCTION TIP: THE PRINCIPLE OF SJF Shortest Job First represents a general scheduling principle that can be applied to any system where the perceived turnaround time per customer (or, in our case, a job) matters. Think of any line you have waited in: if the establishment in question cares about customer satisfaction, it is likely they have taken SJF into account. For example, grocery stores commonly have a “ten-items-or-less” line to ensure that shoppers with only a few things to purchase don’t get stuck behind the family preparing for some upcoming nuclear winter.you see the person in front of you with three carts full of provisions and a checkbook out; it’s going to be a while2. So what should we do?How can we develop a better algorithm to deal with our new reality of jobs that run for different amounts of time?Think about it ﬁrst; then read on.7.4 Shortest Job First (SJF) It turns out that a very simple approach solves this problem; in fact it is an idea stolen from operations research [C54,PV56] and applied to scheduling of jobs in computer systems.
+
+-------------------------
+
+Cosine Similarity Scores on keyword queries from 4 books
+No Overlap
+
+Query: "Explain the Perceptron Algorithm."
+
+Top Result:
+Score: 0.5964
+Source: cog_sci_foundations_text_chunks_and_embeddings.csv
+Page Number: 45
+Passage: Readers of Understanding Cognitive Science can pretend to be the machine head by following the instructions of the machine table, using pencil and paper to manipulate a simulated ticker tape. In this fashion they can easily convert the initial question into the final answer—they fully understand the algorithm. However, they are unable to say what the algorithm accomplishes until they read further in the book.
+
+-------------------------
+
+Cosine Similarity Scores on keyword queries from 4 books
+No Overlap
+
+Query: "Create the smallest deterministic finite automaton M' such that M' behaves identically to M."
+
+Top Result:
+Score: 0.6068
+Source: algorithm_design_manual_text_chunks_and_embeddings.csv
+Page Number: 642
+Passage: 646 18. SET AND STRING PROBLEMS T T H H H H T T H H T T INPUT OUTPUT 18.7 Finite State Machine Minimization Input description: A deterministic ﬁnite automaton M. Problem description: Create the smallest deterministic ﬁnite automaton M ′ such that M ′ behaves identically to M. Discussion: Constructing and minimizing ﬁnite state machines arises repeatedly in software and hardware design applications. Finite state machines are very useful for specifying and recognizing patterns. Modern programming languages such as Java and Python provide built-in support for regular expressions, a particularly natural way of deﬁning automata. Control systems and compilers often use ﬁnite state machines to encode the current state and possible associated actions/transitions. Minimizing the size of these automata reduces both the storage and execution costs of dealing with such machines. Finite state machines are deﬁned by directed graphs. Each vertex represents a state, and each character-labeled edge deﬁnes a transition from one state to another on receipt of the given alphabet symbol.
+
+-------------------------
+
+Cosine Similarity Scores on keyword queries from 4 books
+No Overlap
+
+Query: "Write code for Prim's Algorithm."
+
+Top Result:
+Score: 0.5431
+Source: algorithm_design_manual_text_chunks_and_embeddings.csv
+Page Number: 10
+Passage: 12 1. INTRODUCTION TO ALGORITHM DESIGN Correct algorithms require careful exposition, and eﬀorts to show both cor- rectness and not incorrectness. We develop tools for doing so in the subsections below.1.3.1 Expressing Algorithms Reasoning about an algorithm is impossible without a careful description of the sequence of steps to be performed. The three most common forms of algorithmic notation are (1) English, (2) pseudocode, or (3) a real programming language. We will use all three in this book. Pseudocode is perhaps the most mysterious of the bunch, but it is best deﬁned as a programming language that never complains about syntax errors. All three methods are useful because there is a natural tradeoﬀ between greater ease of expression and precision.
+
+-------------------------
+
+Cosine Similarity Scores on keyword queries from 4 books
+No Overlap
+
+Query: "How to find an inode in Log-structured File Systems?"
+
+Top Result:
+Score: 0.7113
+Source: ostep_text_chunks_and_embeddings.csv
+Page Number: 514
+Passage: 516 LOG-STRUCTURED FILE SYSTEMS TIP: USE A LEVEL OF INDIRECTION People often say that the solution to all problems in Computer Science is simply a level of indirection. This is clearly not true; it is just the solution to most problems. You certainly can think of every virtualization we have studied, e.g., virtual memory, as simply a level of indirection. And certainly the inode map in LFS is a virtualization of inode numbers. Hopefully you can see the great power of indirection in these examples, allowing us to freely move structures around (such as pages in the VM example, or inodes in LFS) without having to change every reference to them. Of course, indirection can have a downside too: extra overhead. So next time you have a problem, try solving it with indirection. But make sure to think about the overheads of doing so ﬁrst.
+
+-------------------------
+
+Cosine Similarity Scores on keyword queries from 4 books
+No Overlap
+
+Query: "Limitation of connectionist approach"
+
+Top Result:
+Score: 0.7217
+Source: cog_sci_foundations_text_chunks_and_embeddings.csv
+Page Number: 128
+Passage: What are the key problems that connectionists see in classical models?Classical models invoke serial processes, which make them far too slow to run on sluggish componentry (Feldman & Ballard, 1982). They involve explicit, local, and digital representations of both rules and symbols, making these models too brittle. “If in a digital system of notations a single pulse is missing, absolute perversion of meaning, i.e., nonsense, may result” (von Neumann, 1958, p. 78). Because of this brittleness, the behaviour of classical models does not degrade gracefully when presented with noisy inputs, and such models are not damage resistant. All of these issues arise from one underlying theme: classical algorithms reflect the kind of information processing carried out by electronic computers, not the kind that characterizes the brain. In short, classical theories are not biologically plausible. Connectionist cognitive science “offers a radically different conception of the basic processing system of the mind-brain, one inspired by our knowledge of the nervous system” (Bechtel & Abrahamsen, 2002, p. 2).
+
+-------------------------
+
+Cosine Similarity Scores on keyword queries from 4 books
+No Overlap
+
+Query: "uniform convergence important for generalization"
+
+Top Result:
+Score: 0.6610
+Source: neural_network_text_chunks_and_embeddings.csv
+Page Number: 140
+Passage: Thus we cannot make use of the cardinality of F\s in obtaining a uniform convergence result for real function classes. In fact, we only need the set F\s to have not too many elements that are very different; instead of cardinality, we use the notion of covers to measure the 'extent' of F\s.140
+
+-------------------------
+
+Cosine Similarity Scores on keyword queries from 4 books
+No Overlap
+
+Query: "Problems with nearest neighbour search"
+
+Top Result:
+Score: 0.6332
+Source: algorithm_design_manual_text_chunks_and_embeddings.csv
+Page Number: 579
+Passage: 17.5 NEAREST NEIGHBOR SEARCH 583 The theoretical guarantees underlying Ayra and Mount’s approximate nearest neigh- bor code ANN [AM93, AMN+98] are somewhat diﬀerent. A sparse weighted graph struc- ture is built from the data set, and the nearest neighbor is found by starting at a random point and greedily walking towards the query point in the graph. The closest point found over several random trials is declared the winner. Similar data structures hold promise for other problems in high-dimensional spaces. Nearest-neighbor search was a subject of the Fifth DIMACS challenge, as reported in [GJM02]. Samet [Sam06] is the best reference on kd-trees and other spatial data structures. All major (and many minor) variants are developed in substantial detail. A shorter survey [Sam05] is also available.
+
+-------------------------
+
+Cosine Similarity Scores on keyword queries from 4 books
+No Overlap
+
+Query: "how to make a cognitive vocabulary"
+
+Top Result:
+Score: 0.6382
+Source: cog_sci_foundations_text_chunks_and_embeddings.csv
+Page Number: 359
+Passage: It stands as one of the pioneering appeals for using the multi- ple levels of investigation within cognitive science. It provides an extremely cogent argument for the need to use a cognitive vocabulary to capture explanatory gener- alizations in the study of cognition. In it, Pylyshyn also argued for establishing the 8
+
+-------------------------
+
