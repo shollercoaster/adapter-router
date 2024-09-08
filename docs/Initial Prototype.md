@@ -1,5 +1,5 @@
 # Prototype
-Created vector embeddings of textbook OSTEP (Operating Systems: Three Easy Pieces) using embedding model and got top 5 passages on finding cosine similarity for a specific query.
+Created vector embeddings of textbooks OSTEP (Operating Systems: Three Easy Pieces), Neural Networks Theory, Algorithm Design Manual, and Mind, Body, World - Foundations of Cognitive Science, using embedding model and got top passage among all embeddings on finding cosine similarity for a specific query.
 # Model choices
 ## [all-mpnet-base-v2](https://huggingface.co/sentence-transformers/all-mpnet-base-v2)
 - doesn't care about dimensions of query and document as long as chunked sentences don't cross model input dimensions (384 tokens). after encoding all embeddings are of size 768.
@@ -22,10 +22,54 @@ loading csv -> processing text embedding -> processing query embedding -> dot pr
 # Results
 - cosine_similarity shows more relevant passages than dot_product
 - `num_sentence_chunk_size` gives better results (=8 gave top score of 0.82, =16 gave top score of 0.75)
+- better scores on same passage from same query using torch.cosine_similarity than from utils.cos_sim. (Why?)
+## Latency
+### Generating Embeddings 
+With overlap = 2
+- 44.55950 seconds.
+- 16.83830 seconds.
+- 47.26642 seconds.
+- 32.18161 seconds.
+Without overlap
+- 38.10320 seconds.
+- 14.42824 seconds.
+- 38.26974 seconds.
+- 26.64616 seconds.
+## Example
+```
+Query: How do operating systems use virtualization to manage memory
+
+Results:
+Score: 0.8207
+To make sure the OS does so, we need some goals to guide us. We have seen these
+goals before (think of the Introduction), and we’ll see them again, but they are
+certainly worth repeating. One major goal of a virtual memory (VM) system is
+transparency2. The OS should implement virtual memory in a way that is invisible
+to the running program. Thus, the program shouldn’t be aware of the fact that
+memory is virtualized; rather, the program behaves as if it has its own private
+physical memory. Behind the scenes, the OS (and hardware) does all the work to
+multiplex memory among many different jobs, and hence implements the illusion.
+Another goal of VM is efﬁciency. The OS should strive to make the virtualization
+as efﬁcient as possible, both in terms of time (i.e., not mak- ing programs run
+much more slowly) and space (i.e., not using too much memory for structures
+needed to support virtualization).
+Page number: 111
+```
 # Next Steps
-- replicate process for 3-4 more software textbooks
-- query matching with appropriate textbook embedding 
+- Better ways to process text
+- Better ways to embed structured data, for eg. code embeddings
+- Metric comparison with existing methods
+- Connection to the project: Finetuning separate from routing
+- Better input data and generalized implementation (i.e. Langchain)
 - think about encodings for adapters
 # Caveats
 - Text processing looks different for every text corpus (still a textbook here), so building a one-size-fits-all robust system for document processing atleast might not be so straightforward
 - Might use a different embedding model for better results
+# Deeper Issues
+- no code embeddings procedure - harder to find
+- images, header, footer, irrelevant information can be removed
+- might need to look for a better embedding model
+- might need to look for langchain, other systematic frameworks
+# Conclusion about RAG
+	However, it's costly and challenging to implement in production, in addition to its low precision (misaligned retrieved chunks) and low recall (failure to retrieve all relevant chunks).
+So this is a problem with RAG for long context in general, not just my problem. 
