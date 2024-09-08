@@ -28,7 +28,7 @@ def open_and_read_pdf(pdf_path: str, start_page: int, end_page: int) -> list[dic
     """
     doc = fitz.open(pdf_path)  # Open the PDF document
     pages_and_texts = []
-    
+
     # Iterate over the pages within the specified range
     for page_num, page in tqdm(enumerate(doc[start_page:end_page])):
         text = page.get_text()  # Extract text from the page
@@ -41,6 +41,7 @@ def open_and_read_pdf(pdf_path: str, start_page: int, end_page: int) -> list[dic
             "page_token_count": len(text) / 4,  # 1 token = ~4 chars
             "text": text  # Store the extracted text
         })
+
     return pages_and_texts
 
 def sentence_chunking(pages_and_texts: list[dict]) -> None:
