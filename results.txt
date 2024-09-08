@@ -1,0 +1,64 @@
+Cosine Similarity Scores
+Overlap set to 2
+
+Query: "How do operating systems use virtualization to manage memory?"
+
+Top Result:
+Score: 0.8098
+Source: ostep_text_chunks_and_embeddings.csv
+Page Number: 128
+Passage: Behind that virtual reality lies the ugly physical truth: that many programs are actually sharing memory at the same time, as the CPU (or CPUs) switches between running one program and the next. Through virtualization, the OS (with the hardware’s help) turns the ugly machine reality into something that is a useful, powerful, and easy to use abstraction.15.1 Assumptions Our ﬁrst attempts at virtualizing memory will be very simple, almost laughably so. Go ahead, laugh all you want; pretty soon it will be the OS laughing at you, when you try to understand the ins and outs of TLBs, multi-level page tables, and other technical wonders. Don’t like the idea of the OS laughing at you?Well, you may be out of luck then; that’s just how the OS rolls. Speciﬁcally, we will assume for now that the user’s address space must be placed contiguously in physical memory. We will also assume, for sim- plicity, that the size of the address space is not too big; speciﬁcally, that it is less than the size of physical memory.
+
+-------------------------
+
+Cosine Similarity Scores
+Overlap set to 2
+
+Query: "Explain the Perceptron Algorithm."
+
+Top Result:
+Score: 0.5811
+Source: neural_network_text_chunks_and_embeddings.csv
+Page Number: 4
+Passage: Introduction Fig.1.2. The perceptron algorithm updates the parameters to move the deci- sion boundary towards a misclassified example.x € W1 and y € {0,1}), the algorithm adds rj(y — f(x))x to w and rj(f(x) — y) to 0, where rj is a (prescribed) fixed positive constant. This update has the effect of moving the decision boundary closer to the misclassified point x (see Figure 1.2). As we shall see in Chapter 24, after a finite number of iterations this algorithm finds values of the parameters that correctly classify all of the training examples, provided such parameters exist. It is instructive to consider the key issues of approximation, estima- tion, and computation for the simple perceptron. Although we shall not study its approximation capabilities in this book, we mention that the representational capabilities of the simple perceptron are rather limited.
+
+-------------------------
+
+Cosine Similarity Scores
+Overlap set to 2
+
+Query: "Create the smallest deterministic finite automaton M' such that M' behaves identically to M."
+
+Top Result:
+Score: 0.5174
+Source: algorithm_design_manual_text_chunks_and_embeddings.csv
+Page Number: 643
+Passage: 18.7 FINITE STATE MACHINE MINIMIZATION 647 over smaller regular expressions. For example, the regular expression a(a+b+c)∗a matches any string on (a, b, c) that begins and ends with distinct as. The best way to test whether a string s is recognized by a given regular expression R constructs the ﬁnite automaton equivalent to R, and then simulates this machine on S. See Section 18.3 (page 628) for alternative approaches to string matching. We consider three diﬀerent problems on ﬁnite automata: • Minimizing deterministic ﬁnite state machines – Transition matrices for ﬁ- nite automata become prohibitively large for sophisticated machines, thus fueling the need for tighter encodings. The most direct approach is to elim- inate redundant states in the automaton. As the example above illustrates, automata of widely varying sizes can compute the same function. Algorithms for minimizing the number of states in a deterministic ﬁnite au- tomaton (DFA) appear in any book on automata theory. The basic approach partitions the states into gross equivalence classes and then reﬁnes the parti- tion. Initially, the states are partitioned into accepting, rejecting, and other classes. The transitions from each node now branch to a given class on a given symbol.
+
+-------------------------
+
+Cosine Similarity Scores
+Overlap set to 2
+
+Query: "Write code for Prim's Algorithm."
+
+Top Result:
+Score: 0.5339
+Source: algorithm_design_manual_text_chunks_and_embeddings.csv
+Page Number: 10
+Passage: 12 1. INTRODUCTION TO ALGORITHM DESIGN Correct algorithms require careful exposition, and eﬀorts to show both cor- rectness and not incorrectness. We develop tools for doing so in the subsections below.1.3.1 Expressing Algorithms Reasoning about an algorithm is impossible without a careful description of the sequence of steps to be performed. The three most common forms of algorithmic notation are (1) English, (2) pseudocode, or (3) a real programming language. We will use all three in this book. Pseudocode is perhaps the most mysterious of the bunch, but it is best deﬁned as a programming language that never complains about syntax errors. All three methods are useful because there is a natural tradeoﬀ between greater ease of expression and precision. English is the most natural but least precise programming language, while Java and C/C++ are precise but diﬃ- cult to write and understand. Pseudocode is generally useful because it represents a happy medium.
+
+-------------------------
+
+Cosine Similarity Scores
+Overlap set to 2
+
+Query: "How to find an inode in Log-structured File Systems?"
+Top Result:
+Score: 0.7113
+Source: ostep_text_chunks_and_embeddings.csv
+Page Number: 514
+Passage: 516 LOG-STRUCTURED FILE SYSTEMS TIP: USE A LEVEL OF INDIRECTION People often say that the solution to all problems in Computer Science is simply a level of indirection. This is clearly not true; it is just the solution to most problems. You certainly can think of every virtualization we have studied, e.g., virtual memory, as simply a level of indirection. And certainly the inode map in LFS is a virtualization of inode numbers. Hopefully you can see the great power of indirection in these examples, allowing us to freely move structures around (such as pages in the VM example, or inodes in LFS) without having to change every reference to them. Of course, indirection can have a downside too: extra overhead. So next time you have a problem, try solving it with indirection. But make sure to think about the overheads of doing so ﬁrst.
+
+-------------------------
+

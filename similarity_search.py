@@ -124,7 +124,26 @@ def print_wrapped(text, wrap_length=80):
     wrapped_text = textwrap.fill(text, wrap_length)
     print(wrapped_text)
 
-# Example usage
+def write_top_result_to_file(query: str, top_result: dict, filename: str="results.txt"):
+    """
+    Write the top result for a query to a text file.
+
+    Parameters:
+        query (str): The user's query.
+        top_result (dict): The top relevant passage.
+        filename (str): Name of the file to write the results to.
+    """
+    with open(filename, "a") as file:
+        file.write("Cosine Similarity Scores\n")
+        file.write("Overlap set to 2\n\n")
+        file.write(f"Query: {query}\n")
+        file.write(f"Top Result:\n")
+        file.write(f"Score: {top_result['score']:.4f}\n")
+        file.write(f"Source: {top_result['source']}\n")
+        file.write(f"Page Number: {top_result['page_number']}\n")
+        file.write(f"Passage: {top_result['sentence_chunk']}\n")
+        file.write("\n-------------------------\n\n")
+
 
 # List of CSV files containing embeddings from different textbooks
 embedding_csvs = [
@@ -140,8 +159,12 @@ with open("queries.txt", "r") as file:
     queries = file.readlines()
 
 for query in queries:
-    # Retrieve top 5 passages from all textbooks
+    # Retrieve top passages from all textbooks
     top_results = retrieve_relevant_resources(query, all_embeddings, embedding_model, top_k=1)
 
     # Print the results
     print_top_results(query, top_results, top_k=5)
+
+    if top_results:
+        write_top_result_to_file(query, top_results[0], filename="results.txt")
+
