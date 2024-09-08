@@ -22,11 +22,21 @@ process_pdf_for_embeddings(
 )
 
 
-# Embeddings for Neural Network Foundations
+# Embeddings for Algorithm Design Manual
 process_pdf_for_embeddings(
     pdf_path="data/algorithm-design-manual.pdf", 
     start_page=14, 
     end_page=665,
+    num_sentence_chunk_size=10, 
+    min_token_length=40,
+    output_file="embeddings/algorithm_design_manual_text_chunks_and_embeddings.csv"
+)
+
+# Embeddings for Cognitive Science Foundations 
+process_pdf_for_embeddings(
+    pdf_path="data/mind-body-world-cog-sci.pdf", 
+    start_page=16, 
+    end_page=440,
     num_sentence_chunk_size=10, 
     min_token_length=40,
     output_file="embeddings/algorithm_design_manual_text_chunks_and_embeddings.csv"
