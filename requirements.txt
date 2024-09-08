@@ -4,3 +4,5 @@ flash-attn
 transformers==4.42.4
 sentence-transformers==2.7.0
 datasets
+spacy
+spacy_chunks
