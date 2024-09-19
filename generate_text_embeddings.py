@@ -8,7 +8,9 @@ process_pdf_for_embeddings(
     end_page=623, 
     num_sentence_chunk_size=8, 
     min_token_length=30, 
-    output_file="embeddings/ostep_text_chunks_and_embeddings.csv"
+    output_file="embeddings/ostep_text_chunks_and_embeddings.csv",
+    header_height=70,
+    footer_height=100,
 )
 
 # Embeddings for Neural Network Foundations

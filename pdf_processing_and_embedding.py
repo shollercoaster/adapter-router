@@ -5,6 +5,7 @@ import fitz
 from tqdm.auto import tqdm
 from spacy.lang.en import English
 import spacy, spacy_chunks
+from collections import defaultdict
 
 # Initialize NLP model and sentence transformer globally
 nlp = English()
@@ -15,33 +16,85 @@ def text_formatter(text: str) -> str:
     """Cleans and formats text: removes extra newlines and trims whitespace."""
     return text.replace("\n", " ").strip()
 
-def open_and_read_pdf(pdf_path: str, start_page: int, end_page: int) -> list[dict]:
-    """
-    Opens a PDF file and extracts text from the specified page range.
-    
-    Parameters:
-        pdf_path (str): Path to the PDF file.
-        start_page (int): Start page number (0-indexed).
-        end_page (int): End page number (0-indexed).
-    
-    Returns:
-        list[dict]: A list of dictionaries containing page metadata and text.
-    """
+def open_and_read_pdf(pdf_path: str, start_page: int, end_page: int, header_height: int, footer_height: int) -> tuple:
     doc = fitz.open(pdf_path)  # Open the PDF document
-    pages_and_texts = []
+    text_per_page = defaultdict(list)
+    code_snippets = []
 
     # Iterate over the pages within the specified range
-    for page_num, page in tqdm(enumerate(doc[start_page:end_page])):
-        text = page.get_text()  # Extract text from the page
-        text = text_formatter(text)  # Clean and format the text
+    for page_num in tqdm(range(start_page, end_page + 1)):
+        page = doc.load_page(page_num)  # Load the specific page
+        page_height = page.rect.height
+
+        # Extract text in block structure
+        blocks = page.get_text("dict")["blocks"]
+        for block in blocks:
+            if "lines" not in block: continue # extracted data could be image, and hence may not contain lines
+            normal_text = ''
+
+            for line in block["lines"]:
+                for span in line["spans"]:
+                    bbox = span["bbox"]
+                    top_y = bbox[1]  # The top y-coordinate of the span
+                    bottom_y = bbox[3]  # The bottom y-coordinate of the span
+                    
+                    # Exclude text that falls within the header or footer region
+                    if top_y > header_height and bottom_y < (page_height - footer_height):
+                        text = text_formatter(span["text"])  # Clean and format the text
+                        font = span["font"]  # Extract the font name
+
+                        # Check if the text is a code snippet based on font or content
+                        if is_code_snippet(text, font):
+                            if normal_text:
+                                normal_text = ''
+                            code_snippets.append(text)
+                        else:
+                            normal_text += ' ' + text
+                            
+            if normal_text:
+                text_per_page[page_num].append(normal_text.strip())
+
+    return code_snippets, text_per_page
+
+def is_code_snippet(text, font):
+    """
+    A simple function to detect code snippets based on indentation,
+    common keywords, and short lines (which may indicate pseudocode).
+    """
+    code_keywords = ['{', '}', '#', 'void', 'str', 'for', 'while', 'if', 'return', 'def', 'accept', 'delete', 'class', 'int', 'float', 'bool', 'end', '=']
+
+    # Check for indentation or common code keywords
+    if text.startswith('    '):
+        return True
+    if any(text.lower().startswith(keyword) for keyword in code_keywords):
+        return True
+    if text.endswith(';'):
+        return True
+    if "courier" in font.lower() or "mono" in font.lower():
+        return True
+    """
+    Removing condition for checking line length since it removes shorter sentences.
+    if len(text) < 30:
+        return True
+    """
+    return False
+
+def text_to_dataframe(text_per_page: dict[list]) -> list[dict]:
+    """
+    Takes individual chunks from each page and creates a dictionary with relevant statistics
+    """
+    pages_and_texts = []
+
+    for page_num in text_per_page:
+        text = ''.join(text_per_page[page_num])
         pages_and_texts.append({
-            "page_number": page_num + 1,  # Adjust page number to 1-based indexing
-            "page_char_count": len(text),  # Record character count for the page
-            "page_word_count": len(text.split(" ")), # Record word count
-            "page_sentence_count_raw": len(text.split(". ")), # Raw period-splitted sentence count
-            "page_token_count": len(text) / 4,  # 1 token = ~4 chars
-            "text": text  # Store the extracted text
-        })
+                    "page_number": page_num + 1,  # Adjust page number to 1-based indexing
+                    "page_char_count": len(text),  # Record character count for the page
+                    "page_word_count": len(text.split(" ")), # Record word count
+                    "page_sentence_count_raw": len(text.split(". ")), # Raw period-splitted sentence count
+                    "page_token_count": len(text) / 4,  # 1 token = ~4 chars
+                    "text": text  # Store the extracted text
+                })
 
     return pages_and_texts
 
@@ -119,7 +172,7 @@ def embed_chunks(pages_and_chunks: list[dict]) -> None:
         # Generate and store the embedding for each chunk of text
         item["embeddings"] = embedding_model.encode(item["sentence_chunk"])
 
-def process_pdf_for_embeddings(pdf_path: str, start_page: int, end_page: int, num_sentence_chunk_size: int, min_token_length: int, output_file: str) -> None:
+def process_pdf_for_embeddings(pdf_path: str, start_page: int, end_page: int, num_sentence_chunk_size: int, min_token_length: int, output_file: str, header_height: int=60, footer_height: int=60) -> None:
     """
     Automates the process of extracting text from a PDF, chunking sentences, generating embeddings, and saving results to a CSV.
     
@@ -131,7 +184,8 @@ def process_pdf_for_embeddings(pdf_path: str, start_page: int, end_page: int, nu
         min_token_length (int): Minimum token count for valid chunks.
         output_file (str): Path to the CSV file for saving results.
     """
-    pages_and_texts = open_and_read_pdf(pdf_path, start_page, end_page)  # Extract text from PDF
+    code_snippets, text_per_page = open_and_read_pdf(pdf_path, start_page, end_page, header_height, footer_height) # Extract text from PDF
+    pages_and_texts = text_to_dataframe(text_per_page)  # Create dataframe for text
     sentence_chunking(pages_and_texts)  # Split text into sentences
     pages_and_chunks = merge_and_filter_chunks(pages_and_texts, num_sentence_chunk_size, min_token_length)  # Create and filter chunks
     embed_chunks(pages_and_chunks)  # Generate embeddings for each chunk
