@@ -8,6 +8,11 @@ import time
 # Load the embedding model
 embedding_model = SentenceTransformer(model_name_or_path="all-mpnet-base-v2", trust_remote_code=True, device="cuda")
 
+# Set up UniXcoder for code embeddings
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+code_embedding_model = UniXcoder("microsoft/unixcoder-base")
+code_embedding_model.to(device)
+
 all_embeddings = []
 
 def load_embeddings(embeddings_df_save_paths: list[str]) -> list[dict]:
@@ -92,7 +97,7 @@ def retrieve_relevant_resources(query: str, all_embeddings: list[dict], model: S
 
     return sorted_results #[:top_k]
 
-def print_top_results(query: str, top_results: list[dict], top_k: int=5):
+def print_top_results(query: str, top_results: list[dict], is_text: bool):
     """
     Print the top-k relevant passages with their scores, page numbers, and sources.
 
@@ -109,8 +114,13 @@ def print_top_results(query: str, top_results: list[dict], top_k: int=5):
         print(f"Score: {result['score']:.4f}")
         print(f"Source: {result['source']}")
         print(f"Page Number: {result['page_number']}")
-        print("Passage:")
-        print_wrapped(result["sentence_chunk"])
+        if is_text:
+            print("Passage:")
+            print_wrapped(result["sentence_chunk"])
+        else: 
+            print("Code Snippet:")
+            print_wrapped(result["code"])
+
         print("\n")
 
 def print_wrapped(text, wrap_length=80):
@@ -147,11 +157,22 @@ def write_top_result_to_file(query: str, top_result: dict, filename: str="result
 
 # List of CSV files containing embeddings from different textbooks
 embedding_csvs = [
-    "embeddings/ostep_text_chunks_and_embeddings.csv",
-    "embeddings/neural_network_text_chunks_and_embeddings.csv",
-    "embeddings/algorithm_design_manual_text_chunks_and_embeddings.csv",
-    "embeddings/cog_sci_foundations_text_chunks_and_embeddings.csv",
+    "ostep_text_chunks_and_embeddings.csv",
+    "neural_network_text_chunks_and_embeddings.csv",
+    "algorithm_design_manual_text_chunks_and_embeddings.csv",
+    "cog_sci_foundations_text_chunks_and_embeddings.csv",
 ]
+
+# Code Embeddings
+code_embedding_csvs = ["embeddings/code/test_embeddings.csv"]
+# code_embedding_csvs = ["embeddings/code/" + str(csv_name) for csv_name in embedding_csvs]
+all_embeddings = load_embeddings(code_embedding_csvs)
+
+query = "priority queue"
+top_results = retrieve_relevant_resources(query, all_embeddings, embedding_model, top_k=3)
+print_top_results(query, top_results, top_k=5)
+
+breakpoint()
 
 # Load embeddings from multiple sources
 all_embeddings = load_embeddings(embedding_csvs)
@@ -160,12 +181,12 @@ with open("queries.txt", "r") as file:
     queries = file.readlines()
 
 for query in queries:
-    # Retrieve top passages from all textbooks
-    top_results = retrieve_relevant_resources(query, all_embeddings, embedding_model, top_k=1)
+    if not query.startswith("#"):
+        # Retrieve top passages from all textbooks
+        top_results = retrieve_relevant_resources(query, all_embeddings, embedding_model, top_k=1)
 
-    # Print the results
-    print_top_results(query, top_results, top_k=5)
+        # Print the results
+        print_top_results(query, top_results, top_k=5)
 
-    if top_results:
-        write_top_result_to_file(query, top_results[0], filename="results/results_without_overlap.txt")
-
+        if top_results:
+            write_top_result_to_file(query, top_results[0], filename="results/results_without_overlap.txt")

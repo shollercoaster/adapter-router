@@ -216,7 +216,7 @@ def create_code_embeddings(pages_and_chunks: list[dict], code_corpus: dict) -> N
 
     for item in tqdm(pages_and_chunks):
         if item['code']:
-	    item['code_embedding'] = get_single_code_embedding(item['code'])
+            item['code_embedding'] = get_single_code_embedding(item['code'])
 
     end_time = time.time()
     print(f"[INFO] Time taken to generate document code embeddings: {end_time-start_time:.5f} seconds.")
