@@ -17,16 +17,16 @@ embedding_model = SentenceTransformer("all-mpnet-base-v2", trust_remote_code=Tru
 
 # Set up UniXcoder for code embeddings
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-model = UniXcoder("microsoft/unixcoder-base")
-model.to(device)
+code_embedding_model = UniXcoder("microsoft/unixcoder-base")
+code_embedding_model.to(device)
 
 """
 Extract embeddings from a code snippet or a natural language query.
 """
 def get_single_code_embedding(text):
-    tokens_ids = model.tokenize([text],max_length=512,mode="<encoder-only>")
+    tokens_ids = code_embedding_model.tokenize([text],max_length=512,mode="<encoder-only>")
     source_ids = torch.tensor(tokens_ids).to(device)
-    tokens_embeddings, nl_embedding = model(source_ids)
+    tokens_embeddings, nl_embedding = code_embedding_model(source_ids)
     norm_nl_embedding = torch.nn.functional.normalize(nl_embedding, p=2, dim=1)
     norm_nl_embedding = norm_nl_embedding.detach().cpu().numpy()[0]
     return norm_nl_embedding
@@ -35,10 +35,33 @@ def text_formatter(text: str) -> str:
     """Cleans and formats text: removes extra newlines and trims whitespace."""
     return text.replace("\n", " ").strip()
 
+def is_code_snippet(text, font):
+    """
+    A simple function to detect code snippets based on indentation,
+    common keywords, and short lines (which may indicate pseudocode).
+    """
+    code_keywords = ['>', '{', '}', '#', 'void', 'str', 'for', 'while', 'if', 'return', 'def', 'accept', 'delete', 'class', 'int', 'float', 'bool', 'end', '=']
+
+    # Check for indentation or common code keywords
+    if text.startswith('    '):
+        return True
+    if any(text.lower().startswith(keyword) for keyword in code_keywords):
+        return True
+    if text.endswith(';'):
+        return True
+    if "courier" in font.lower() or "mono" in font.lower():
+        return True
+    """
+    Removing condition for checking line length since it removes shorter sentences.
+    if len(text) < 30:
+        return True
+    """
+    return False
+
 def open_and_read_pdf(pdf_path: str, start_page: int, end_page: int, header_height: int, footer_height: int) -> tuple:
     doc = fitz.open(pdf_path)  # Open the PDF document
     text_per_page = defaultdict(list)
-    code_snippets = []
+    code_snippets = dict()
 
     # Iterate over the pages within the specified range
     for page_num in tqdm(range(start_page, end_page + 1)):
@@ -62,7 +85,7 @@ def open_and_read_pdf(pdf_path: str, start_page: int, end_page: int, header_heig
                     if top_y > header_height and bottom_y < (page_height - footer_height):
                         text = text_formatter(span["text"])  # Clean and format the text
                         font = span["font"]  # Extract the font name
-
+                        print("single text snippet is: ", text)
                         # Check if the text is a code snippet based on font or content
                         if is_code_snippet(text, font):
                             if normal_text:
@@ -74,34 +97,11 @@ def open_and_read_pdf(pdf_path: str, start_page: int, end_page: int, header_heig
             if normal_text:
                 text_per_page[page_num].append(normal_text.strip())
         
-        code_snippets.append('\n'.join(current_code_snippet))
+        code_snippets[page_num] = ('\n'.join(current_code_snippet))
 
     return code_snippets, text_per_page
 
-def is_code_snippet(text, font):
-    """
-    A simple function to detect code snippets based on indentation,
-    common keywords, and short lines (which may indicate pseudocode).
-    """
-    code_keywords = ['{', '}', '#', 'void', 'str', 'for', 'while', 'if', 'return', 'def', 'accept', 'delete', 'class', 'int', 'float', 'bool', 'end', '=']
-
-    # Check for indentation or common code keywords
-    if text.startswith('    '):
-        return True
-    if any(text.lower().startswith(keyword) for keyword in code_keywords):
-        return True
-    if text.endswith(';'):
-        return True
-    if "courier" in font.lower() or "mono" in font.lower():
-        return True
-    """
-    Removing condition for checking line length since it removes shorter sentences.
-    if len(text) < 30:
-        return True
-    """
-    return False
-
-def text_to_dataframe(text_per_page: dict[list]) -> list[dict]:
+def text_to_dataframe(text_per_page: dict[list], code_snippets: dict) -> list[dict]:
     """
     Takes individual chunks from each page and creates a dictionary with relevant statistics
     """
@@ -117,6 +117,10 @@ def text_to_dataframe(text_per_page: dict[list]) -> list[dict]:
                     "page_token_count": len(text) / 4,  # 1 token = ~4 chars
                     "text": text  # Store the extracted text
                 })
+        
+        # add code snippet for corresponding page
+        if page_num in code_snippets:
+            pages_and_texts[-1]['code'] = code_snippets[page_num]
 
     return pages_and_texts
 
@@ -200,23 +204,21 @@ def embed_chunks(pages_and_chunks: list[dict]) -> None:
     
     print(f"[INFO] Time taken to generate document embeddings: {end_time-start_time:.5f} seconds.")
 
-def create_code_embeddings(code_corpus: list[str]) -> None:
+def create_code_embeddings(pages_and_chunks: list[dict], code_corpus: dict) -> None:
     """
     Generates embeddings for each code snippet.
     
     Parameters:
-        code_snippets (list[str]): List of code snippets read page-wise.
+        pages_and_chunks (list[dict]): List of text chunks for embedding.
+        code_snippets (dict): List of code snippets read page-wise.
     """
     start_time = time.time()
 
-    vector_database = []
-    for code in code_corpus:
-        vector_database.append(get_single_code_embedding(code))
+    for page_num, code_snippet in code_corpus.items():
+        pages_and_chunks[page_num]['code_embedding'] = get_single_code_embedding(code_snippet)
 
     end_time = time.time()
     print(f"[INFO] Time taken to generate document code embeddings: {end_time-start_time:.5f} seconds.")
-
-    return vector_database
 
 def process_pdf_for_embeddings(pdf_path: str, start_page: int, end_page: int, num_sentence_chunk_size: int, min_token_length: int, output_path: str, header_height: int=50, footer_height: int=60) -> None:
     """
@@ -231,19 +233,19 @@ def process_pdf_for_embeddings(pdf_path: str, start_page: int, end_page: int, nu
         output_file (str): Path to the CSV file for saving results.
     """
     code_snippets, text_per_page = open_and_read_pdf(pdf_path, start_page, end_page, header_height, footer_height) # Extract text from PDF
-    pages_and_texts = text_to_dataframe(text_per_page)  # Create dataframe for text
+    pages_and_texts = text_to_dataframe(text_per_page, code_snippets)  # Create dataframe for text
     sentence_chunking(pages_and_texts)  # Split text into sentences
     pages_and_chunks = merge_and_filter_chunks(pages_and_texts, num_sentence_chunk_size, min_token_length)  # Create and filter chunks
     embed_chunks(pages_and_chunks)  # Generate embeddings for each chunk
 
-    code_database = create_code_embeddings(code_snippets) # Create code database
+    code_database = create_code_embeddings(pages_and_chunks, code_snippets) # Create code database
 
     # Save the final embeddings to a CSV file
     df = pd.DataFrame(pages_and_chunks)
     df.to_csv("embeddings/text/" + str(output_path), index=False)
 
-    code_df = pd.DataFrame(code_database)
-    code_df.to_csv("embeddings/code/" + str(output_path), index=False)
+    # code_df = pd.DataFrame(code_database)
+    # code_df.to_csv("embeddings/code/" + str(output_path), index=False)
     print(f"Embeddings saved to {output_path}")
 
 # Statistical Analysis 
@@ -278,5 +280,5 @@ def calculate_page_statistics(pages_and_texts: list[dict]) -> pd.DataFrame:
     return df
 
 # Example usage
-# pages_and_texts = open_and_read_pdf("data/mind-body-world-cog-sci.pdf", start_page=16, end_page=440)
-# df = calculate_page_statistics(pages_and_texts)
+pages_and_texts = open_and_read_pdf("data/algorithm-design-manual.pdf", start_page=120, end_page=124, header_height=60, footer_height=50)
+df = calculate_page_statistics(pages_and_texts)
