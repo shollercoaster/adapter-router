@@ -5,6 +5,8 @@ from sentence_transformers import SentenceTransformer, util
 import textwrap
 import time
 
+from unixcoder import UniXcoder
+
 # Load the embedding model
 embedding_model = SentenceTransformer(model_name_or_path="all-mpnet-base-v2", trust_remote_code=True, device="cuda")
 
@@ -164,7 +166,7 @@ embedding_csvs = [
 ]
 
 # Code Embeddings
-code_embedding_csvs = ["embeddings/code/test_embeddings.csv"]
+code_embedding_csvs = ["embeddings/text/test_embeddings.csv"]
 # code_embedding_csvs = ["embeddings/code/" + str(csv_name) for csv_name in embedding_csvs]
 all_embeddings = load_embeddings(code_embedding_csvs)
 

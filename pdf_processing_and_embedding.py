@@ -215,8 +215,8 @@ def create_code_embeddings(pages_and_chunks: list[dict], code_corpus: dict) -> N
     start_time = time.time()
 
     for item in tqdm(pages_and_chunks):
-        if item['code']:
-            item['code_embedding'] = get_single_code_embedding(item['code'])
+        if not item['code']: continue
+        else: item['code_embedding'] = get_single_code_embedding(item['code'])
 
     end_time = time.time()
     print(f"[INFO] Time taken to generate document code embeddings: {end_time-start_time:.5f} seconds.")
@@ -239,7 +239,7 @@ def process_pdf_for_embeddings(pdf_path: str, start_page: int, end_page: int, nu
     pages_and_chunks = merge_and_filter_chunks(pages_and_texts, num_sentence_chunk_size, min_token_length)  # Create and filter chunks
     embed_chunks(pages_and_chunks)  # Generate embeddings for each chunk
 
-    code_database = create_code_embeddings(pages_and_chunks, code_snippets) # Create code database
+    code_database = create_code_embeddings(pages_and_texts, code_snippets) # Create code database
 
     # Save the final embeddings to a CSV file
     df = pd.DataFrame(pages_and_chunks)
