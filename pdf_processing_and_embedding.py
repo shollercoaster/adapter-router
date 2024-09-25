@@ -1,4 +1,5 @@
 import pandas as pd
+import torch
 from sentence_transformers import SentenceTransformer
 import re
 import fitz
@@ -6,10 +7,28 @@ from tqdm.auto import tqdm
 from spacy.lang.en import English
 import time
 
+from unixcoder import UniXcoder
+
 # Initialize NLP model and sentence transformer globally
 nlp = English()
 nlp.add_pipe("sentencizer")  # Add sentence segmentation capability
 embedding_model = SentenceTransformer("all-mpnet-base-v2", trust_remote_code=True, device="cuda")
+
+# Set up UniXcoder for code embeddings
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+model = UniXcoder("microsoft/unixcoder-base")
+model.to(device)
+
+"""
+Extract embeddings from a code snippet or a natural language query.
+"""
+def get_single_code_embedding(text):
+    tokens_ids = model.tokenize([text],max_length=512,mode="<encoder-only>")
+    source_ids = torch.tensor(tokens_ids).to(device)
+    tokens_embeddings, nl_embedding = model(source_ids)
+    norm_nl_embedding = torch.nn.functional.normalize(nl_embedding, p=2, dim=1)
+    norm_nl_embedding = norm_nl_embedding.detach().cpu().numpy()[0]
+    return norm_nl_embedding
 
 def text_formatter(text: str) -> str:
     """Cleans and formats text: removes extra newlines and trims whitespace."""
@@ -24,6 +43,7 @@ def open_and_read_pdf(pdf_path: str, start_page: int, end_page: int, header_heig
     for page_num in tqdm(range(start_page, end_page + 1)):
         page = doc.load_page(page_num)  # Load the specific page
         page_height = page.rect.height
+        current_code_snippet = []
 
         # Extract text in block structure
         blocks = page.get_text("dict")["blocks"]
@@ -46,12 +66,14 @@ def open_and_read_pdf(pdf_path: str, start_page: int, end_page: int, header_heig
                         if is_code_snippet(text, font):
                             if normal_text:
                                 normal_text = ''
-                            code_snippets.append(text)
+                            current_code_snippet.append(text)
                         else:
                             normal_text += ' ' + text
                             
             if normal_text:
                 text_per_page[page_num].append(normal_text.strip())
+        
+        code_snippets.append('\n'.join(current_code_snippet))
 
     return code_snippets, text_per_page
 
@@ -171,13 +193,31 @@ def embed_chunks(pages_and_chunks: list[dict]) -> None:
 
     for item in tqdm(pages_and_chunks):
         # Generate and store the embedding for each chunk of text
-        item["embeddings"] = embedding_model.encode(item["sentence_chunk"])
+        item["text_embeddings"] = embedding_model.encode(item["sentence_chunk"])
 
     end_time = time.time()
     
     print(f"[INFO] Time taken to generate document embeddings: {end_time-start_time:.5f} seconds.")
 
-def process_pdf_for_embeddings(pdf_path: str, start_page: int, end_page: int, num_sentence_chunk_size: int, min_token_length: int, output_file: str) -> None:
+def create_code_embeddings(code_corpus: list[str]) -> None:
+    """
+    Generates embeddings for each code snippet.
+    
+    Parameters:
+        code_snippets (list[str]): List of code snippets read page-wise.
+    """
+    start_time = time.time()
+
+    vector_database = []
+    for code in code_corpus:
+        vector_database.append(get_single_code_embedding(code))
+
+    end_time = time.time()
+    print(f"[INFO] Time taken to generate document code embeddings: {end_time-start_time:.5f} seconds.")
+
+    return vector_database
+
+def process_pdf_for_text_embeddings(pdf_path: str, start_page: int, end_page: int, num_sentence_chunk_size: int, min_token_length: int, output_path: str, header_height: int, footer_height: int) -> None:
     """
     Automates the process of extracting text from a PDF, chunking sentences, generating embeddings, and saving results to a CSV.
     
@@ -195,10 +235,15 @@ def process_pdf_for_embeddings(pdf_path: str, start_page: int, end_page: int, nu
     pages_and_chunks = merge_and_filter_chunks(pages_and_texts, num_sentence_chunk_size, min_token_length)  # Create and filter chunks
     embed_chunks(pages_and_chunks)  # Generate embeddings for each chunk
 
+    code_database = create_code_embeddings(code_snippets) # Create code database
+
     # Save the final embeddings to a CSV file
     df = pd.DataFrame(pages_and_chunks)
-    df.to_csv(output_file, index=False)
-    print(f"Embeddings saved to {output_file}")
+    df.to_csv("embeddings/text/" + str(output_path), index=False)
+
+    code_df = pd.DataFrame(code_database)
+    code_df.to_csv("embeddings/code/" + str(output_path), index=False)
+    print(f"Embeddings saved to {output_path}")
 
 # Statistical Analysis 
 def calculate_page_statistics(pages_and_texts: list[dict]) -> pd.DataFrame:
