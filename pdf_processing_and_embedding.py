@@ -88,7 +88,7 @@ def merge_and_filter_chunks(pages_and_texts: list[dict], num_sentence_chunk_size
     pages_and_chunks = []
 
     for item in pages_and_texts:
-        sentence_chunks = split_list(item["sentences"], num_sentence_chunk_size, overlap=2)  # Split sentences into chunks with overlap
+        sentence_chunks = split_list(item["sentences"], num_sentence_chunk_size, overlap=0)  # Split sentences into chunks with overlap
         
         for chunk in sentence_chunks:
             # Join sentences into a single string and clean up spacing

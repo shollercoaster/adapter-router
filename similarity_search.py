@@ -135,7 +135,7 @@ def write_top_result_to_file(query: str, top_result: dict, filename: str="result
     """
     with open(filename, "a") as file:
         file.write("Cosine Similarity Scores on keyword queries from 4 books\n")
-        file.write("Overlap set to 2\n\n")
+        file.write("No Overlap\n\n")
         file.write(f"Query: {query}\n")
         file.write(f"Top Result:\n")
         file.write(f"Score: {top_result['score']:.4f}\n")
@@ -167,5 +167,5 @@ for query in queries:
     print_top_results(query, top_results, top_k=5)
 
     if top_results:
-        write_top_result_to_file(query, top_results[0], filename="results/results_with_overlap.txt")
+        write_top_result_to_file(query, top_results[0], filename="results/results_without_overlap.txt")
 
