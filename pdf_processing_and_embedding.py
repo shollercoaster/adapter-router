@@ -85,7 +85,7 @@ def open_and_read_pdf(pdf_path: str, start_page: int, end_page: int, header_heig
                     if top_y > header_height and bottom_y < (page_height - footer_height):
                         text = text_formatter(span["text"])  # Clean and format the text
                         font = span["font"]  # Extract the font name
-                        print("single text snippet is: ", text)
+                        
                         # Check if the text is a code snippet based on font or content
                         if is_code_snippet(text, font):
                             if normal_text:
@@ -214,8 +214,9 @@ def create_code_embeddings(pages_and_chunks: list[dict], code_corpus: dict) -> N
     """
     start_time = time.time()
 
-    for page_num, code_snippet in code_corpus.items():
-        pages_and_chunks[page_num]['code_embedding'] = get_single_code_embedding(code_snippet)
+    for item in tqdm(pages_and_chunks):
+        if item['code']:
+	    item['code_embedding'] = get_single_code_embedding(item['code'])
 
     end_time = time.time()
     print(f"[INFO] Time taken to generate document code embeddings: {end_time-start_time:.5f} seconds.")
@@ -280,5 +281,16 @@ def calculate_page_statistics(pages_and_texts: list[dict]) -> pd.DataFrame:
     return df
 
 # Example usage
-pages_and_texts = open_and_read_pdf("data/algorithm-design-manual.pdf", start_page=120, end_page=124, header_height=60, footer_height=50)
-df = calculate_page_statistics(pages_and_texts)
+# code_snippets, pages_and_texts = open_and_read_pdf("data/algorithm-design-manual.pdf", start_page=120, end_page=124, header_height=60, footer_height=50)
+# df = calculate_page_statistics(pages_and_texts)
+# df = text_to_dataframe(pages_and_texts, code_snippets)
+# print(df[2:])
+# Embeddings for Algorithm Design Manual
+process_pdf_for_embeddings(
+    pdf_path="data/algorithm-design-manual.pdf", 
+    start_page=120, 
+    end_page=124,
+    num_sentence_chunk_size=8, 
+    min_token_length=40,
+    output_path="test_embeddings.csv"
+)
