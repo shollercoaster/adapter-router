@@ -17,7 +17,7 @@ code_embedding_model.to(device)
 
 all_embeddings = []
 
-def load_embeddings(embeddings_df_save_paths: list[str]) -> list[dict]:
+def load_embeddings(embeddings_df_save_paths: list[str], is_text: bool=True) -> list[dict]:
     """
     Load multiple CSVs with embeddings and return a list of dictionaries containing embeddings and metadata.
 
@@ -33,8 +33,13 @@ def load_embeddings(embeddings_df_save_paths: list[str]) -> list[dict]:
         df = pd.read_csv(csv_path)
 
         # Convert the stringified numpy arrays in the 'embeddings' column back to actual arrays
-        df["embeddings"] = df["embeddings"].apply(lambda x: np.fromstring(x.strip("[]"), sep=" "))
-        embeddings = torch.tensor(np.array(df["embeddings"].tolist()), dtype=torch.float32).to("cuda")
+        if is_text:
+            df["embeddings"] = df["embeddings"].apply(lambda x: np.fromstring(x.strip("[]"), sep=" "))
+            embeddings = torch.tensor(np.array(df["embeddings"].tolist()), dtype=torch.float32).to("cuda")
+
+        else:
+            df["code_embedding"] = df["code_embedding"].apply(lambda x: np.fromstring(x.strip("[]"), sep=" "))
+            embeddings = torch.tensor(np.array(df["code_embedding"].tolist()), dtype=torch.float32).to("cuda")
 
         # Create a record for each chunk with its metadata and the source (book) name
         pages_and_chunks = df.to_dict(orient="records")
@@ -168,11 +173,11 @@ embedding_csvs = [
 # Code Embeddings
 code_embedding_csvs = ["embeddings/text/test_embeddings.csv"]
 # code_embedding_csvs = ["embeddings/code/" + str(csv_name) for csv_name in embedding_csvs]
-all_embeddings = load_embeddings(code_embedding_csvs)
+all_embeddings = load_embeddings(code_embedding_csvs, is_text=False)
 
 query = "priority queue"
 top_results = retrieve_relevant_resources(query, all_embeddings, embedding_model, top_k=3)
-print_top_results(query, top_results, top_k=5)
+print_top_results(query, top_results, is_text=bool)
 
 breakpoint()
 
