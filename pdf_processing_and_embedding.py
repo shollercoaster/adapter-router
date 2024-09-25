@@ -6,6 +6,7 @@ import fitz
 from tqdm.auto import tqdm
 from spacy.lang.en import English
 import time
+from collections import defaultdict
 
 from unixcoder import UniXcoder
 
@@ -217,7 +218,7 @@ def create_code_embeddings(code_corpus: list[str]) -> None:
 
     return vector_database
 
-def process_pdf_for_text_embeddings(pdf_path: str, start_page: int, end_page: int, num_sentence_chunk_size: int, min_token_length: int, output_path: str, header_height: int, footer_height: int) -> None:
+def process_pdf_for_embeddings(pdf_path: str, start_page: int, end_page: int, num_sentence_chunk_size: int, min_token_length: int, output_path: str, header_height: int=50, footer_height: int=60) -> None:
     """
     Automates the process of extracting text from a PDF, chunking sentences, generating embeddings, and saving results to a CSV.
     
@@ -277,5 +278,5 @@ def calculate_page_statistics(pages_and_texts: list[dict]) -> pd.DataFrame:
     return df
 
 # Example usage
-pages_and_texts = open_and_read_pdf("data/mind-body-world-cog-sci.pdf", start_page=16, end_page=440)
-df = calculate_page_statistics(pages_and_texts)
+# pages_and_texts = open_and_read_pdf("data/mind-body-world-cog-sci.pdf", start_page=16, end_page=440)
+# df = calculate_page_statistics(pages_and_texts)
