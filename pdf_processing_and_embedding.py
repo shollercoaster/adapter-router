@@ -182,6 +182,7 @@ def merge_and_filter_chunks(pages_and_texts: list[dict], num_sentence_chunk_size
                 "chunk_token_count": len(chunk_text) / 4  # Approximate 1 token as 4 characters
             }
 
+            if item["code"]: chunk_info["code"] = item["code"]
             if chunk_info["chunk_token_count"] > min_token_length:  # Filter out chunks that are too small
                 pages_and_chunks.append(chunk_info)
 
@@ -239,7 +240,7 @@ def process_pdf_for_embeddings(pdf_path: str, start_page: int, end_page: int, nu
     pages_and_chunks = merge_and_filter_chunks(pages_and_texts, num_sentence_chunk_size, min_token_length)  # Create and filter chunks
     embed_chunks(pages_and_chunks)  # Generate embeddings for each chunk
 
-    code_database = create_code_embeddings(pages_and_texts, code_snippets) # Create code database
+    code_database = create_code_embeddings(pages_and_chunks, code_snippets) # Create code database
 
     # Save the final embeddings to a CSV file
     df = pd.DataFrame(pages_and_chunks)

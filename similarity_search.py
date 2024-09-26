@@ -7,6 +7,8 @@ import time
 
 from unixcoder import UniXcoder
 
+from pdf_processing_and_embedding import get_single_code_embedding
+
 # Load the embedding model
 embedding_model = SentenceTransformer(model_name_or_path="all-mpnet-base-v2", trust_remote_code=True, device="cuda")
 
@@ -55,7 +57,7 @@ def load_embeddings(embeddings_df_save_paths: list[str], is_text: bool=True) -> 
 
     return all_embeddings
 
-def retrieve_relevant_resources(query: str, all_embeddings: list[dict], model: SentenceTransformer, top_k: int=5):
+def retrieve_relevant_resources(query: str, all_embeddings: list[dict], model: SentenceTransformer, top_k: int=5, is_text: bool=True):
     """
     Retrieve the top-k most relevant passages across all embedding databases.
 
@@ -69,7 +71,8 @@ def retrieve_relevant_resources(query: str, all_embeddings: list[dict], model: S
         list[dict]: A list of top results sorted by similarity scores.
     """
     # Embed the query
-    query_embedding = model.encode(query, convert_to_tensor=True, device="cuda")
+    if is_text: query_embedding = model.encode(query, convert_to_tensor=True, device="cuda")
+    else: query_embedding = get_single_code_embedding(query)
 
     all_results = []
 
@@ -176,8 +179,8 @@ code_embedding_csvs = ["embeddings/text/test_embeddings.csv"]
 all_embeddings = load_embeddings(code_embedding_csvs, is_text=False)
 
 query = "priority queue"
-top_results = retrieve_relevant_resources(query, all_embeddings, embedding_model, top_k=3)
-print_top_results(query, top_results, is_text=bool)
+top_results = retrieve_relevant_resources(query, all_embeddings, code_embedding_model, top_k=3, is_text=False)
+print_top_results(query, top_results, is_text=False)
 
 breakpoint()
 
