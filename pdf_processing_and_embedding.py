@@ -16,7 +16,7 @@ nlp.add_pipe("sentencizer")  # Add sentence segmentation capability
 embedding_model = SentenceTransformer("all-mpnet-base-v2", trust_remote_code=True, device="cuda")
 
 # Set up UniXcoder for code embeddings
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+device = torch.device("cuda")
 code_embedding_model = UniXcoder("microsoft/unixcoder-base")
 code_embedding_model.to(device)
 
@@ -217,7 +217,7 @@ def create_code_embeddings(pages_and_chunks: list[dict], code_corpus: dict) -> N
 
     for item in tqdm(pages_and_chunks):
         if not item['code']: continue
-        else: item['code_embedding'] = get_single_code_embedding(item['code'])
+        else: item['code_embeddings'] = get_single_code_embedding(item['code'])
 
     end_time = time.time()
     print(f"[INFO] Time taken to generate document code embeddings: {end_time-start_time:.5f} seconds.")

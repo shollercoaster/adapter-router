@@ -13,7 +13,7 @@ from pdf_processing_and_embedding import get_single_code_embedding
 embedding_model = SentenceTransformer(model_name_or_path="all-mpnet-base-v2", trust_remote_code=True, device="cuda")
 
 # Set up UniXcoder for code embeddings
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+device = torch.device("cuda")
 code_embedding_model = UniXcoder("microsoft/unixcoder-base")
 code_embedding_model.to(device)
 
@@ -40,8 +40,8 @@ def load_embeddings(embeddings_df_save_paths: list[str], is_text: bool=True) -> 
             embeddings = torch.tensor(np.array(df["embeddings"].tolist()), dtype=torch.float32).to("cuda")
 
         else:
-            df["code_embedding"] = df["code_embedding"].apply(lambda x: np.fromstring(x.strip("[]"), sep=" "))
-            embeddings = torch.tensor(np.array(df["code_embedding"].tolist()), dtype=torch.float32).to("cuda")
+            df["code_embeddings"] = df["code_embeddings"].apply(lambda x: np.fromstring(x.strip("[]"), sep=" "))
+            embeddings = torch.tensor(np.array(df["code_embeddings"].tolist()), dtype=torch.float32).to("cuda")
 
         # Create a record for each chunk with its metadata and the source (book) name
         pages_and_chunks = df.to_dict(orient="records")
@@ -57,13 +57,13 @@ def load_embeddings(embeddings_df_save_paths: list[str], is_text: bool=True) -> 
 
     return all_embeddings
 
-def get_top_code_embeddings(query: str, all_embeddings: list[dict]) -> float: 
-    nlq_emb = get_single_code_embedding(query)
+def get_top_code_embeddings(query: str, all_embeddings: list[dict], top_k: int=5) -> float: 
+    nlq_emb = torch.from_numpy(get_single_code_embedding(query)).cuda()
     for dataset in all_embeddings:
-        embeddings = dataset["code_embeddings"]
+        embeddings = dataset["embeddings"]
         pages_and_chunks = dataset["pages_and_chunks"]
-        cos_scores = util.cos_sim(nlq_emb, embeddings)[0]
-        top_results = torch.topk(cos_scores, k=3)
+        cos_scores = torch.nn.functional.cosine_similarity(nlq_emb, embeddings)
+        top_results = torch.topk(cos_scores, k=top_k)
         top_values, top_indices = top_results.values, top_results.indices
     all_results = []
     # Collect top results with metadata
@@ -199,7 +199,7 @@ code_embedding_csvs = ["embeddings/text/test_embeddings.csv"]
 all_embeddings = load_embeddings(code_embedding_csvs, is_text=False)
 
 query = "priority queue"
-top_results = retrieve_relevant_resources(query, all_embeddings, code_embedding_model, top_k=3)
+top_results = get_top_code_embeddings(query, all_embeddings, top_k=3)
 print_top_results(query, top_results, is_text=False)
 
 breakpoint()
