@@ -1,0 +1,7 @@
+"Priority Queue"
+"Prim's Algorithm"
+"Detect cycles using DFS"
+"solve the fractional knapsack problem"
+"multi-level feedback queue (MLFQ) scheduler"
+"Lock With Queues, Test-and-set, Yield, And Wakeup"
+"Write code to create a counter without locks"

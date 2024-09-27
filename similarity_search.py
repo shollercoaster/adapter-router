@@ -126,7 +126,57 @@ def retrieve_relevant_resources(query: str, all_embeddings: list[dict], model: S
 
     return sorted_results #[:top_k]
 
-def print_top_results(query: str, top_results: list[dict], is_text: bool):
+def format_code_snippet(code_snippet: str) -> str:
+    """
+    Format the code snippet by breaking lines at certain symbols and adding indentation
+    to improve readability.
+
+    Parameters:
+        code_snippet (str): The raw code snippet as a single line.
+
+    Returns:
+        str: Formatted code snippet with proper line breaks and indentation.
+    """
+    # Define symbols where we break the line
+    break_symbols = ['{', '}', ';']
+
+    # Initialize variables for formatted code and indentation level
+    formatted_code = ""
+    indent_level = 0
+    indent_spaces = 4  # Number of spaces for each indent level
+
+    # Split the code snippet into tokens based on break symbols
+    tokens = []
+    current_token = ""
+
+    for char in code_snippet:
+        current_token += char
+        if char in break_symbols:
+            tokens.append(current_token.strip())
+            current_token = ""
+
+    # Append any remaining characters as the final token
+    if current_token.strip():
+        tokens.append(current_token.strip())
+
+    # Process each token and apply indentation
+    for token in tokens:
+        stripped_token = token.strip()
+
+        # Dedent if the token starts with '}', since this ends a block
+        if stripped_token.startswith("}"):
+            indent_level -= 1
+
+        # Add the token with proper indentation
+        formatted_code += " " * (indent_level * indent_spaces) + stripped_token + "\n"
+
+        # Indent if the token ends with '{', since this starts a block
+        if stripped_token.endswith("{"):
+            indent_level += 1
+
+    return formatted_code.strip()
+
+def print_top_results(query: str, top_results: list[dict], is_text: bool=True):
     """
     Print the top-k relevant passages with their scores, page numbers, and sources.
 
@@ -148,7 +198,8 @@ def print_top_results(query: str, top_results: list[dict], is_text: bool):
             print_wrapped(result["sentence_chunk"])
         else: 
             print("Code Snippet:")
-            print_wrapped(result["code_snippet"])
+            formatted_code = format_code_snippet(result["code_snippet"])
+            print_wrapped(formatted_code)
 
         print("\n")
 
@@ -180,7 +231,7 @@ def write_top_result_to_file(query: str, top_result: dict, filename: str="result
         file.write(f"Score: {top_result['score']:.4f}\n")
         file.write(f"Source: {top_result['source']}\n")
         file.write(f"Page Number: {top_result['page_number']}\n")
-        file.write(f"Passage: {top_result['sentence_chunk']}\n")
+        # file.write(f"Passage: {top_result['sentence_chunk']}\n")
         file.write("\n-------------------------\n\n")
 
 
@@ -192,31 +243,30 @@ embedding_csvs = [
     "cog_sci_foundations_text_chunks_and_embeddings.csv",
 ]
 
-# Code Embeddings
-code_embedding_csvs = ["embeddings/text/test_embeddings.csv"]
-# code_embedding_csvs = ["embeddings/code/" + str(csv_name) for csv_name in embedding_csvs]
+text_embedding_csvs = ["embeddings/text/" + str(csv_name) for csv_name in embedding_csvs]
+code_embedding_csvs = ["embeddings/code/" + str(csv_name) for csv_name in embedding_csvs]
 
-all_embeddings = load_embeddings(code_embedding_csvs, is_text=False)
+### Text based Queries
+all_text_embeddings = load_embeddings(text_embedding_csvs, is_text=False)
 
-query = "priority queue"
-top_results = get_top_code_embeddings(query, all_embeddings, top_k=3)
-print_top_results(query, top_results, is_text=False)
-
-breakpoint()
-
-# Load embeddings from multiple sources
-all_embeddings = load_embeddings(embedding_csvs)
-
-with open("queries.txt", "r") as file:
+with open("code_queries.txt", "r") as file:
     queries = file.readlines()
 
 for query in queries:
     if not query.startswith("#"):
         # Retrieve top passages from all textbooks
-        top_results = retrieve_relevant_resources(query, all_embeddings, embedding_model, top_k=1)
+        top_results = get_top_code_embeddings(query, all_text_embeddings, embedding_model, top_k=1, is_text=False)
 
         # Print the results
-        print_top_results(query, top_results, top_k=5)
+        print_top_results(query, top_results, is_text=False)
 
-        if top_results:
-            write_top_result_to_file(query, top_results[0], filename="results/results_without_overlap.txt")
+        # if top_results:
+        #     write_top_result_to_file(query, top_results[0], filename="results/code_search_results.txt")
+
+### Testing Code
+# code_embedding_csvs = ["embeddings/text/test_embeddings.csv"]
+# all_embeddings = load_embeddings(code_embedding_csvs, is_text=False)
+
+# query = "priority queue"
+# top_results = get_top_code_embeddings(query, all_embeddings, top_k=3)
+# print_top_results(query, top_results, is_text=False)

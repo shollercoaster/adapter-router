@@ -281,17 +281,17 @@ def calculate_page_statistics(pages_and_texts: list[dict]) -> pd.DataFrame:
 
     return df
 
-# Example usage
+### Testing Code
+
 # code_snippets, pages_and_texts = open_and_read_pdf("data/algorithm-design-manual.pdf", start_page=120, end_page=124, header_height=60, footer_height=50)
 # df = calculate_page_statistics(pages_and_texts)
-# df = text_to_dataframe(pages_and_texts, code_snippets)
-# print(df[2:])
+
 # Embeddings for Algorithm Design Manual
-process_pdf_for_embeddings(
-    pdf_path="data/algorithm-design-manual.pdf", 
-    start_page=120, 
-    end_page=124,
-    num_sentence_chunk_size=8, 
-    min_token_length=40,
-    output_path="test_embeddings.csv"
-)
+# process_pdf_for_embeddings(
+#     pdf_path="data/algorithm-design-manual.pdf", 
+#     start_page=120, 
+#     end_page=124,
+#     num_sentence_chunk_size=8, 
+#     min_token_length=40,
+#     output_path="test_embeddings.csv"
+# )
