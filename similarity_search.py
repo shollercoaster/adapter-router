@@ -57,7 +57,27 @@ def load_embeddings(embeddings_df_save_paths: list[str], is_text: bool=True) -> 
 
     return all_embeddings
 
-def retrieve_relevant_resources(query: str, all_embeddings: list[dict], model: SentenceTransformer, top_k: int=5, is_text: bool=True):
+def get_top_code_embeddings(query: str, all_embeddings: list[dict]) -> float: 
+    nlq_emb = get_single_code_embedding(query)
+    for dataset in all_embeddings:
+        embeddings = dataset["code_embeddings"]
+        pages_and_chunks = dataset["pages_and_chunks"]
+        cos_scores = util.cos_sim(nlq_emb, embeddings)[0]
+        top_results = torch.topk(cos_scores, k=3)
+        top_values, top_indices = top_results.values, top_results.indices
+    all_results = []
+    # Collect top results with metadata
+    for score, idx in zip(top_values, top_indices):
+        all_results.append({
+            "score": score,
+            "page_number": pages_and_chunks[idx]["page_number"],
+            "code_snippet": pages_and_chunks[idx]["code"],
+            "source": pages_and_chunks[idx]["source"]
+        })
+    sorted_results = sorted(all_results, key=lambda x: x["score"], reverse=True)
+    return sorted_results
+
+def retrieve_relevant_resources(query: str, all_embeddings: list[dict], model: SentenceTransformer, top_k: int=5):
     """
     Retrieve the top-k most relevant passages across all embedding databases.
 
@@ -71,8 +91,7 @@ def retrieve_relevant_resources(query: str, all_embeddings: list[dict], model: S
         list[dict]: A list of top results sorted by similarity scores.
     """
     # Embed the query
-    if is_text: query_embedding = model.encode(query, convert_to_tensor=True, device="cuda")
-    else: query_embedding = get_single_code_embedding(query)
+    query_embedding = model.encode(query, convert_to_tensor=True, device="cuda")
 
     all_results = []
 
@@ -129,7 +148,7 @@ def print_top_results(query: str, top_results: list[dict], is_text: bool):
             print_wrapped(result["sentence_chunk"])
         else: 
             print("Code Snippet:")
-            print_wrapped(result["code"])
+            print_wrapped(result["code_snippet"])
 
         print("\n")
 
@@ -176,10 +195,11 @@ embedding_csvs = [
 # Code Embeddings
 code_embedding_csvs = ["embeddings/text/test_embeddings.csv"]
 # code_embedding_csvs = ["embeddings/code/" + str(csv_name) for csv_name in embedding_csvs]
+
 all_embeddings = load_embeddings(code_embedding_csvs, is_text=False)
 
 query = "priority queue"
-top_results = retrieve_relevant_resources(query, all_embeddings, code_embedding_model, top_k=3, is_text=False)
+top_results = retrieve_relevant_resources(query, all_embeddings, code_embedding_model, top_k=3)
 print_top_results(query, top_results, is_text=False)
 
 breakpoint()
