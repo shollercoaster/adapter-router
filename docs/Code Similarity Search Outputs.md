@@ -2,6 +2,7 @@
 - Trying better code embedding models
 	- uniXcoder trained on LoRA adapters (like jina_embedding_v3)
 - Maybe code embedding models should be multimodal, such that alongwith code snippets, user can also input descriptive captions (or keywords) about code. Some keywords encoded with the code snippet will improve semantic search. Will research to see if this has been done before.
+- Better code snippet detection.
 - Min token limit on code?
 - Trying on more code-heavy textbooks
 # Some good outputs: 
