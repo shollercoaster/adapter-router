@@ -270,7 +270,7 @@ for query in queries:
         print_top_results(query, top_results, is_text=False)
 
         if top_results:
-            write_top_result_to_file(query, top_results[0], filename="results/code_search_results.txt", is_text=False)
+            write_top_result_to_file(query, top_results[0], filename="results/formatted_code_search_results.txt", is_text=False)
 
 ### Testing Code
 # code_embedding_csvs = ["embeddings/text/test_embeddings.csv"]
