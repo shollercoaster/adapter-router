@@ -10,6 +10,8 @@ from collections import defaultdict
 
 from unixcoder import UniXcoder
 
+from similarity_search import format_code_snippet
+
 # Initialize NLP model and sentence transformer globally
 nlp = English()
 nlp.add_pipe("sentencizer")  # Add sentence segmentation capability
@@ -125,7 +127,7 @@ def text_and_code_to_dataframe(text_per_page: dict[list], code_snippets: dict) -
         if page_num in code_snippets:
             pages_and_code.append({
                 "page_number": page_num + 1,
-                "code": code_snippets[page_num] # storing the code snippet without formatting, a separate experiment could embed the code with formatting and check results
+                "code": format_code_snippet(code_snippets[page_num]) # storing the code snippet without formatting, a separate experiment could embed the code with formatting and check results
             })
 
     return pages_and_texts, pages_and_code
