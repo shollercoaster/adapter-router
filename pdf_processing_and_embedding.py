@@ -8,58 +8,12 @@ from spacy.lang.en import English
 import time
 from collections import defaultdict
 
-from unixcoder import UniXcoder
-
-from similarity_search import format_code_snippet
+from utils import text_formatter, format_code_snippet, get_single_code_embedding, is_code_snippet
 
 # Initialize NLP model and sentence transformer globally
 nlp = English()
 nlp.add_pipe("sentencizer")  # Add sentence segmentation capability
 embedding_model = SentenceTransformer("all-mpnet-base-v2", trust_remote_code=True, device="cuda")
-
-# Set up UniXcoder for code embeddings
-device = torch.device("cuda")
-code_embedding_model = UniXcoder("microsoft/unixcoder-base")
-code_embedding_model.to(device)
-
-def get_single_code_embedding(text: str) -> list:
-    """
-    Extract embeddings from a code snippet or a natural language query.
-    """
-    # print(type(text), text)
-    tokens_ids = code_embedding_model.tokenize([text],max_length=512,mode="<encoder-only>")
-    source_ids = torch.tensor(tokens_ids).to(device)
-    tokens_embeddings, nl_embedding = code_embedding_model(source_ids)
-    norm_nl_embedding = torch.nn.functional.normalize(nl_embedding, p=2, dim=1)
-    norm_nl_embedding = norm_nl_embedding.detach().cpu().numpy()[0]
-    return norm_nl_embedding
-
-def text_formatter(text: str) -> str:
-    """Cleans and formats text: removes extra newlines and trims whitespace."""
-    return text.replace("\n", " ").strip()
-
-def is_code_snippet(text, font):
-    """
-    A simple function to detect code snippets based on indentation,
-    common keywords, and short lines (which may indicate pseudocode).
-    """
-    code_keywords = ['/', '>', '{', '}', '#', 'void', 'str', 'while', 'if', 'return', 'def', 'accept', 'delete', 'class', 'int', 'float', 'bool', 'end', '=']
-
-    if text.startswith('    '):
-        return True
-    first_word = text.split()[0] if text.strip() else ""
-    if first_word in code_keywords:
-        return True
-    if text.endswith(';'):
-        return True
-    if "courier" in font.lower() or "mono" in font.lower():
-        return True
-    """
-    Removing condition for checking line length since it removes shorter sentences.
-    if len(text) < 30:
-        return True
-    """
-    return False
 
 def open_and_read_pdf(pdf_path: str, start_page: int, end_page: int, header_height: int, footer_height: int) -> tuple:
     """Opens PDF document and extracts text and code segments per page."""

@@ -7,7 +7,7 @@ import time
 
 from unixcoder import UniXcoder
 
-from pdf_processing_and_embedding import get_single_code_embedding
+from utils import get_single_code_embedding, format_code_snippet
 
 # Load the embedding model
 embedding_model = SentenceTransformer(model_name_or_path="all-mpnet-base-v2", trust_remote_code=True, device="cuda")
@@ -135,54 +135,6 @@ def retrieve_relevant_resources(query: str, all_embeddings: list[dict], model: S
 
     return sorted_results #[:top_k]
 
-def format_code_snippet(code_snippet: str) -> str:
-    """
-    Format the code snippet by breaking lines at certain symbols and adding indentation to improve readability.
-    Parameters:
-        code_snippet (str): The raw code snippet as a single line.
-
-    Returns:
-        str: Formatted code snippet with proper line breaks and indentation.
-    """
-    # Define symbols where we break the line
-    break_symbols = ['{', '}', ';']
-
-    # Initialize variables for formatted code and indentation level
-    formatted_code = ""
-    indent_level = 0
-    indent_spaces = 4  # Number of spaces for each indent level
-
-    # Split the code snippet into tokens based on break symbols
-    tokens = []
-    current_token = ""
-
-    for char in code_snippet:
-        current_token += char
-        if char in break_symbols:
-            tokens.append(current_token.strip())
-            current_token = ""
-
-    # Append any remaining characters as the final token
-    if current_token.strip():
-        tokens.append(current_token.strip())
-
-    # Process each token and apply indentation
-    for token in tokens:
-        stripped_token = token.strip()
-
-        # Dedent if the token starts with '}', since this ends a block
-        if stripped_token.startswith("}"):
-            indent_level -= 1
-
-        # Add the token with proper indentation
-        formatted_code += " " * (indent_level * indent_spaces) + stripped_token + "\n"
-
-        # Indent if the token ends with '{', since this starts a block
-        if stripped_token.endswith("{"):
-            indent_level += 1
-
-    return formatted_code.strip()
-
 def print_top_results(query: str, top_results: list[dict], is_text: bool=True):
     """
     Print the top-k relevant passages with their scores, page numbers, and sources.
@@ -271,11 +223,3 @@ for query in queries:
 
         if top_results:
             write_top_result_to_file(query, top_results[0], filename="results/formatted_code_search_results.txt", is_text=False)
-
-### Testing Code
-# code_embedding_csvs = ["embeddings/text/test_embeddings.csv"]
-# all_embeddings = load_embeddings(code_embedding_csvs, is_text=False)
-
-# query = "priority queue"
-# top_results = get_top_code_embeddings(query, all_embeddings, top_k=3)
-# print_top_results(query, top_results, is_text=False)
