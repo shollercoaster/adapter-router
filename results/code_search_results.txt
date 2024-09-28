@@ -1,0 +1,208 @@
+Cosine Similarity Scores on queries 
+Overlap = 2
+
+Query: "Priority Queue"
+
+Top Result:
+Score: 0.5138
+Source: algorithm-design-manual_embeddings.csv
+Page Number: 122
+Code Snippet: while in a
+item_type q[PQ_SIZE+1];
+int n;
+}
+priority_queue;
+
+-------------------------
+
+Cosine Similarity Scores on queries 
+Overlap = 2
+
+Query: "Prim's Algorithm"
+
+Top Result:
+Score: 0.4236
+Source: algorithm-design-manual_embeddings.csv
+Page Number: 328
+Code Snippet: Intractable Problems and Approximation
+for which problems are hard is an important skill for algorithm designers, and only
+
+-------------------------
+
+Cosine Similarity Scores on queries 
+Overlap = 2
+
+Query: "Detect cycles using DFS"
+
+Top Result:
+Score: 0.4541
+Source: algorithm-design-manual_embeddings.csv
+Page Number: 191
+Code Snippet: for each vertex
+for each vertex
+if
+for directed graphs.
+
+-------------------------
+
+Cosine Similarity Scores on queries 
+Overlap = 2
+
+Query: "solve the fractional knapsack problem"
+
+Top Result:
+Score: 0.4447
+Source: algorithm-design-manual_embeddings.csv
+Page Number: 440
+Code Snippet: for the 0/1 knapsack problem, with the twist that it supports multiple knapsacks.
+for knapsack and subset sum includes [BvG99, CLRS01, GJ79, Man89].
+
+-------------------------
+
+Cosine Similarity Scores on queries 
+Overlap = 2
+
+Query: "multi-level feedback queue (MLFQ) scheduler"
+
+Top Result:
+Score: 0.3350
+Source: algorithm-design-manual_embeddings.csv
+Page Number: 100
+Code Snippet: integrating this dictionary with the priority queue, we built a data structure
+
+-------------------------
+
+Cosine Similarity Scores on queries 
+Overlap = 2
+
+Query: "Lock With Queues, Test-and-set, Yield, And Wakeup"
+
+Top Result:
+Score: 0.3562
+Source: algorithm-design-manual_embeddings.csv
+Page Number: 361
+Code Snippet: While (
+=
+for the set cover
+=
+= 2
+=
+
+-------------------------
+
+Cosine Similarity Scores on queries 
+Overlap = 2
+
+Query: "Write code to create a counter without locks"
+Top Result:
+Score: 0.2921
+Source: algorithm-design-manual_embeddings.csv
+Page Number: 611
+Code Snippet: into a small number of simple (typically con-
+
+-------------------------
+
+Cosine Similarity Scores on queries 
+Overlap = 2
+
+Query: "Priority Queue"
+
+Top Result:
+Score: 0.5138
+Source: algorithm-design-manual_embeddings.csv
+Page Number: 122
+Code Snippet: while in a
+item_type q[PQ_SIZE+1];
+int n;
+}
+priority_queue;
+
+-------------------------
+
+Cosine Similarity Scores on queries 
+Overlap = 2
+
+Query: "Prim's Algorithm"
+
+Top Result:
+Score: 0.4236
+Source: algorithm-design-manual_embeddings.csv
+Page Number: 328
+Code Snippet: Intractable Problems and Approximation
+for which problems are hard is an important skill for algorithm designers, and only
+
+-------------------------
+
+Cosine Similarity Scores on queries 
+Overlap = 2
+
+Query: "Detect cycles using DFS"
+
+Top Result:
+Score: 0.4541
+Source: algorithm-design-manual_embeddings.csv
+Page Number: 191
+Code Snippet: for each vertex
+for each vertex
+if
+for directed graphs.
+
+-------------------------
+
+Cosine Similarity Scores on queries 
+Overlap = 2
+
+Query: "solve the fractional knapsack problem"
+
+Top Result:
+Score: 0.4447
+Source: algorithm-design-manual_embeddings.csv
+Page Number: 440
+Code Snippet: for the 0/1 knapsack problem, with the twist that it supports multiple knapsacks.
+for knapsack and subset sum includes [BvG99, CLRS01, GJ79, Man89].
+
+-------------------------
+
+Cosine Similarity Scores on queries 
+Overlap = 2
+
+Query: "multi-level feedback queue (MLFQ) scheduler"
+
+Top Result:
+Score: 0.3350
+Source: algorithm-design-manual_embeddings.csv
+Page Number: 100
+Code Snippet: integrating this dictionary with the priority queue, we built a data structure
+
+-------------------------
+
+Cosine Similarity Scores on queries 
+Overlap = 2
+
+Query: "Lock With Queues, Test-and-set, Yield, And Wakeup"
+
+Top Result:
+Score: 0.3562
+Source: algorithm-design-manual_embeddings.csv
+Page Number: 361
+Code Snippet: While (
+=
+for the set cover
+=
+= 2
+=
+
+-------------------------
+
+Cosine Similarity Scores on queries 
+Overlap = 2
+
+Query: "Write code to create a counter without locks"
+Top Result:
+Score: 0.2921
+Source: algorithm-design-manual_embeddings.csv
+Page Number: 611
+Code Snippet: into a small number of simple (typically con-
+
+-------------------------
+

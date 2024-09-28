@@ -205,8 +205,9 @@ def print_top_results(query: str, top_results: list[dict], is_text: bool=True):
             print_wrapped(result["sentence_chunk"])
         else: 
             print("Code Snippet:")
+            print(result["code_snippet"])
             formatted_code = format_code_snippet(result["code_snippet"])
-            print_wrapped(formatted_code)
+            # print_wrapped(formatted_code)
             result["code_snippet"] = formatted_code
 
         print("\n")
@@ -245,8 +246,8 @@ def write_top_result_to_file(query: str, top_result: dict, filename: str="result
 
 # List of CSV files containing embeddings from different textbooks
 embedding_csvs = [
-    "ostep_text_chunks_and_embeddings.csv",
-    "algorithm_design_manual_text_chunks_and_embeddings.csv",
+    "operating_systems_three_easy_pieces_embeddings.csv",
+    "algorithm-design-manual_embeddings.csv",
 #    "neural_network_text_chunks_and_embeddings.csv",
 #    "cog_sci_foundations_text_chunks_and_embeddings.csv",
 ]
@@ -255,7 +256,7 @@ text_embedding_csvs = ["embeddings/text/" + str(csv_name) for csv_name in embedd
 code_embedding_csvs = ["embeddings/code/" + str(csv_name) for csv_name in embedding_csvs]
 
 ### Text or Code based Queries
-all_text_and_code_embeddings = load_embeddings(code_embedding_csvs, is_text=False)
+all_embeddings = load_embeddings(code_embedding_csvs, is_text=False)
 
 with open("code_queries.txt", "r") as file:
     queries = file.readlines()
@@ -263,7 +264,7 @@ with open("code_queries.txt", "r") as file:
 for query in queries:
     if not query.startswith("#"):
         # Retrieve top passages from all textbooks
-        top_results = retrieve_top_code_embeddings(query, all_text_and_code_embeddings, top_k=3)
+        top_results = retrieve_top_code_embeddings(query, all_embeddings, top_k=3)
 
         # Print the results
         print_top_results(query, top_results, is_text=False)

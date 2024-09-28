@@ -24,6 +24,7 @@ def get_single_code_embedding(text: str) -> list:
     """
     Extract embeddings from a code snippet or a natural language query.
     """
+    # print(type(text), text)
     tokens_ids = code_embedding_model.tokenize([text],max_length=512,mode="<encoder-only>")
     source_ids = torch.tensor(tokens_ids).to(device)
     tokens_embeddings, nl_embedding = code_embedding_model(source_ids)
@@ -123,7 +124,7 @@ def text_and_code_to_dataframe(text_per_page: dict[list], code_snippets: dict) -
         if page_num in code_snippets:
             pages_and_code.append({
                 "page_number": page_num + 1,
-                "code": code_snippets # storing the code snippet without formatting, a separate experiment could embed the code with formatting and check results
+                "code": code_snippets[page_num] # storing the code snippet without formatting, a separate experiment could embed the code with formatting and check results
             })
 
     return pages_and_texts, pages_and_code
