@@ -57,7 +57,17 @@ def load_embeddings(embeddings_df_save_paths: list[str], is_text: bool=True) -> 
 
     return all_embeddings
 
-def get_top_code_embeddings(query: str, all_embeddings: list[dict], top_k: int=5) -> float: 
+def retrieve_top_code_embeddings(query: str, all_embeddings: list[dict], top_k: int=5) -> float: 
+    """
+    Retrieve the top-k most relevant code snippets across all embedding databases.
+    Parameters:
+        query (str): The user's query.
+        all_embeddings (list[dict]): List of embeddings and their associated metadata.
+        top_k (int): Number of top results to return.
+
+    Returns:
+        list[dict]: A list of top results sorted by similarity scores.
+    """
     nlq_emb = torch.from_numpy(get_single_code_embedding(query)).cuda()
     for dataset in all_embeddings:
         embeddings = dataset["embeddings"]
@@ -80,7 +90,6 @@ def get_top_code_embeddings(query: str, all_embeddings: list[dict], top_k: int=5
 def retrieve_relevant_resources(query: str, all_embeddings: list[dict], model: SentenceTransformer, top_k: int=5):
     """
     Retrieve the top-k most relevant passages across all embedding databases.
-
     Parameters:
         query (str): The user's query.
         all_embeddings (list[dict]): List of embeddings and their associated metadata.
@@ -128,9 +137,7 @@ def retrieve_relevant_resources(query: str, all_embeddings: list[dict], model: S
 
 def format_code_snippet(code_snippet: str) -> str:
     """
-    Format the code snippet by breaking lines at certain symbols and adding indentation
-    to improve readability.
-
+    Format the code snippet by breaking lines at certain symbols and adding indentation to improve readability.
     Parameters:
         code_snippet (str): The raw code snippet as a single line.
 
@@ -215,41 +222,40 @@ def print_wrapped(text, wrap_length=80):
     wrapped_text = textwrap.fill(text, wrap_length)
     print(wrapped_text)
 
-def write_top_result_to_file(query: str, top_result: dict, filename: str="results.txt"):
+def write_top_result_to_file(query: str, top_result: dict, filename: str="results.txt", is_text: bool=True):
     """
     Write the top result for a query to a text file.
-
     Parameters:
         query (str): The user's query.
         top_result (dict): The top relevant passage.
         filename (str): Name of the file to write the results to.
     """
     with open(filename, "a") as file:
-        file.write("Cosine Similarity Scores on keyword queries from 4 books\n")
-        file.write("No Overlap\n\n")
+        file.write("Cosine Similarity Scores on queries \n")
+        file.write("Overlap = 2\n\n")
         file.write(f"Query: {query}\n")
         file.write(f"Top Result:\n")
         file.write(f"Score: {top_result['score']:.4f}\n")
         file.write(f"Source: {top_result['source']}\n")
         file.write(f"Page Number: {top_result['page_number']}\n")
-        file.write(f"Code Snippet: {top_result['code_snippet']}\n")
-        # file.write(f"Passage: {top_result['sentence_chunk']}\n")
+        if not is_text: file.write(f"Code Snippet: {top_result['code_snippet']}\n")
+        else: file.write(f"Passage: {top_result['sentence_chunk']}\n")
         file.write("\n-------------------------\n\n")
 
 
 # List of CSV files containing embeddings from different textbooks
 embedding_csvs = [
     "ostep_text_chunks_and_embeddings.csv",
-#    "neural_network_text_chunks_and_embeddings.csv",
     "algorithm_design_manual_text_chunks_and_embeddings.csv",
+#    "neural_network_text_chunks_and_embeddings.csv",
 #    "cog_sci_foundations_text_chunks_and_embeddings.csv",
 ]
 
-all_embedding_csvs = ["embeddings/" + str(csv_name) for csv_name in embedding_csvs]
-# code_embedding_csvs = ["embeddings/code/" + str(csv_name) for csv_name in embedding_csvs]
+text_embedding_csvs = ["embeddings/text/" + str(csv_name) for csv_name in embedding_csvs]
+code_embedding_csvs = ["embeddings/code/" + str(csv_name) for csv_name in embedding_csvs]
 
-### Text based Queries
-all_text_and_code_embeddings = load_embeddings(all_embedding_csvs, is_text=False)
+### Text or Code based Queries
+all_text_and_code_embeddings = load_embeddings(code_embedding_csvs, is_text=False)
 
 with open("code_queries.txt", "r") as file:
     queries = file.readlines()
@@ -257,13 +263,13 @@ with open("code_queries.txt", "r") as file:
 for query in queries:
     if not query.startswith("#"):
         # Retrieve top passages from all textbooks
-        top_results = get_top_code_embeddings(query, all_text_and_code_embeddings, top_k=3)
+        top_results = retrieve_top_code_embeddings(query, all_text_and_code_embeddings, top_k=3)
 
         # Print the results
         print_top_results(query, top_results, is_text=False)
 
         if top_results:
-            write_top_result_to_file(query, top_results[0], filename="results/code_search_results.txt")
+            write_top_result_to_file(query, top_results[0], filename="results/code_search_results.txt", is_text=False)
 
 ### Testing Code
 # code_embedding_csvs = ["embeddings/text/test_embeddings.csv"]
