@@ -12,7 +12,7 @@ process_pdf_for_embeddings(
     header_height=70,
     footer_height=100,
 )
-
+'''
 # Embeddings for Neural Network Foundations
 process_pdf_for_embeddings(
     pdf_path="data/neural-network-learning-theoretical-foundations.pdf", 
@@ -22,7 +22,7 @@ process_pdf_for_embeddings(
     min_token_length=30, 
     output_path="neural_network_text_chunks_and_embeddings.csv"
 )
-
+'''
 
 # Embeddings for Algorithm Design Manual
 process_pdf_for_embeddings(
@@ -33,7 +33,7 @@ process_pdf_for_embeddings(
     min_token_length=40,
     output_path="algorithm_design_manual_text_chunks_and_embeddings.csv"
 )
-
+'''
 # Embeddings for Cognitive Science Foundations 
 process_pdf_for_embeddings(
     pdf_path="data/mind-body-world-cog-sci.pdf", 
@@ -43,3 +43,4 @@ process_pdf_for_embeddings(
     min_token_length=40,
     output_path="cog_sci_foundations_text_chunks_and_embeddings.csv"
 )
+'''

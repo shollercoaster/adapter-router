@@ -167,7 +167,7 @@ def merge_and_filter_chunks(pages_and_texts: list[dict], num_sentence_chunk_size
     pages_and_chunks = []
 
     for item in pages_and_texts:
-        sentence_chunks = split_list(item["sentences"], num_sentence_chunk_size, overlap=0)  # Split sentences into chunks with overlap
+        sentence_chunks = split_list(item["sentences"], num_sentence_chunk_size, overlap=2)  # Split sentences into chunks with overlap
         
         for chunk in sentence_chunks:
             # Join sentences into a single string and clean up spacing
@@ -182,7 +182,10 @@ def merge_and_filter_chunks(pages_and_texts: list[dict], num_sentence_chunk_size
                 "chunk_token_count": len(chunk_text) / 4  # Approximate 1 token as 4 characters
             }
 
-            if item["code"]: chunk_info["code"] = item["code"]
+            if item["code"]: 
+                chunk_info["code"] = item["code"]
+#                chunk_info["code_embeddings"] = item["code_embeddings"]
+
             if chunk_info["chunk_token_count"] > min_token_length:  # Filter out chunks that are too small
                 pages_and_chunks.append(chunk_info)
 
@@ -205,7 +208,7 @@ def embed_chunks(pages_and_chunks: list[dict]) -> None:
     
     print(f"[INFO] Time taken to generate document embeddings: {end_time-start_time:.5f} seconds.")
 
-def create_code_embeddings(pages_and_chunks: list[dict], code_corpus: dict) -> None:
+def create_code_embeddings(pages_and_chunks: list[dict]) -> None:
     """
     Generates embeddings for each code snippet.
     
@@ -236,15 +239,15 @@ def process_pdf_for_embeddings(pdf_path: str, start_page: int, end_page: int, nu
     """
     code_snippets, text_per_page = open_and_read_pdf(pdf_path, start_page, end_page, header_height, footer_height) # Extract text from PDF
     pages_and_texts = text_to_dataframe(text_per_page, code_snippets)  # Create dataframe for text
+#    create_code_embeddings(pages_and_texts) # Create code database
     sentence_chunking(pages_and_texts)  # Split text into sentences
     pages_and_chunks = merge_and_filter_chunks(pages_and_texts, num_sentence_chunk_size, min_token_length)  # Create and filter chunks
+    create_code_embeddings(pages_and_chunks) # Create code database
     embed_chunks(pages_and_chunks)  # Generate embeddings for each chunk
-
-    code_database = create_code_embeddings(pages_and_chunks, code_snippets) # Create code database
 
     # Save the final embeddings to a CSV file
     df = pd.DataFrame(pages_and_chunks)
-    df.to_csv("embeddings/text/" + str(output_path), index=False)
+    df.to_csv("embeddings/" + str(output_path), index=False)
 
     # code_df = pd.DataFrame(code_database)
     # code_df.to_csv("embeddings/code/" + str(output_path), index=False)

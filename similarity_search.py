@@ -200,6 +200,7 @@ def print_top_results(query: str, top_results: list[dict], is_text: bool=True):
             print("Code Snippet:")
             formatted_code = format_code_snippet(result["code_snippet"])
             print_wrapped(formatted_code)
+            result["code_snippet"] = formatted_code
 
         print("\n")
 
@@ -231,6 +232,7 @@ def write_top_result_to_file(query: str, top_result: dict, filename: str="result
         file.write(f"Score: {top_result['score']:.4f}\n")
         file.write(f"Source: {top_result['source']}\n")
         file.write(f"Page Number: {top_result['page_number']}\n")
+        file.write(f"Code Snippet: {top_result['code_snippet']}\n")
         # file.write(f"Passage: {top_result['sentence_chunk']}\n")
         file.write("\n-------------------------\n\n")
 
@@ -238,16 +240,16 @@ def write_top_result_to_file(query: str, top_result: dict, filename: str="result
 # List of CSV files containing embeddings from different textbooks
 embedding_csvs = [
     "ostep_text_chunks_and_embeddings.csv",
-    "neural_network_text_chunks_and_embeddings.csv",
+#    "neural_network_text_chunks_and_embeddings.csv",
     "algorithm_design_manual_text_chunks_and_embeddings.csv",
-    "cog_sci_foundations_text_chunks_and_embeddings.csv",
+#    "cog_sci_foundations_text_chunks_and_embeddings.csv",
 ]
 
-text_embedding_csvs = ["embeddings/text/" + str(csv_name) for csv_name in embedding_csvs]
-code_embedding_csvs = ["embeddings/code/" + str(csv_name) for csv_name in embedding_csvs]
+all_embedding_csvs = ["embeddings/" + str(csv_name) for csv_name in embedding_csvs]
+# code_embedding_csvs = ["embeddings/code/" + str(csv_name) for csv_name in embedding_csvs]
 
 ### Text based Queries
-all_text_embeddings = load_embeddings(text_embedding_csvs, is_text=False)
+all_text_and_code_embeddings = load_embeddings(all_embedding_csvs, is_text=False)
 
 with open("code_queries.txt", "r") as file:
     queries = file.readlines()
@@ -255,13 +257,13 @@ with open("code_queries.txt", "r") as file:
 for query in queries:
     if not query.startswith("#"):
         # Retrieve top passages from all textbooks
-        top_results = get_top_code_embeddings(query, all_text_embeddings, embedding_model, top_k=1, is_text=False)
+        top_results = get_top_code_embeddings(query, all_text_and_code_embeddings, top_k=3)
 
         # Print the results
         print_top_results(query, top_results, is_text=False)
 
-        # if top_results:
-        #     write_top_result_to_file(query, top_results[0], filename="results/code_search_results.txt")
+        if top_results:
+            write_top_result_to_file(query, top_results[0], filename="results/code_search_results.txt")
 
 ### Testing Code
 # code_embedding_csvs = ["embeddings/text/test_embeddings.csv"]
