@@ -45,7 +45,8 @@ def is_code_snippet(text, font):
 
     if text.startswith('    '):
         return True
-    if any(re.search(r'\b' + re.escape(keyword) + r'\b', text) for keyword in code_keywords):
+    first_word = text.split()[0] if text.strip() else ""
+    if first_word in code_keywords:
         return True
     if text.endswith(';'):
         return True
