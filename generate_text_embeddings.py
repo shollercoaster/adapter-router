@@ -3,7 +3,7 @@ from pdf_processing_and_embedding import process_pdf_for_embeddings
 
 # Embeddings for OSTEP
 process_pdf_for_embeddings(
-    pdf_path="operating_systems_three_easy_pieces", 
+    file_path_name="operating_systems_three_easy_pieces", 
     start_page=38, 
     end_page=623, 
     num_sentence_chunk_size=8, 
@@ -14,7 +14,7 @@ process_pdf_for_embeddings(
 
 # Embeddings for Algorithm Design Manual
 process_pdf_for_embeddings(
-    pdf_path="algorithm-design-manual.pdf", 
+    file_path_name="algorithm-design-manual", 
     start_page=14, 
     end_page=665,
     num_sentence_chunk_size=8, 
