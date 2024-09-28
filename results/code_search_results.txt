@@ -206,3 +206,209 @@ Code Snippet: into a small number of simple (typically con-
 
 -------------------------
 
+Cosine Similarity Scores on queries 
+Overlap = 2
+
+Query: "Priority Queue"
+
+Top Result:
+Score: 0.3757
+Source: algorithm-design-manual_embeddings.csv
+Page Number: 121
+Code Snippet: But what if we improve the data structure? It takes
+queues. So what happens if we replace the data structure with a better priority
+
+-------------------------
+
+Cosine Similarity Scores on queries 
+Overlap = 2
+
+Query: "Prim's Algorithm"
+
+Top Result:
+Score: 0.4907
+Source: algorithm-design-manual_embeddings.csv
+Page Number: 238
+Code Snippet: Does either Prim’s and Kruskal’s algorithm work if there are negative edge
+if every cycle of
+
+-------------------------
+
+Cosine Similarity Scores on queries 
+Overlap = 2
+
+Query: "Detect cycles using DFS"
+
+Top Result:
+Score: 0.4238
+Source: algorithm-design-manual_embeddings.csv
+Page Number: 519
+Code Snippet: while
+shortest path, and edge/vertex connectivity.
+
+-------------------------
+
+Cosine Similarity Scores on queries 
+Overlap = 2
+
+Query: "solve the fractional knapsack problem"
+
+Top Result:
+Score: 0.6861
+Source: algorithm-design-manual_embeddings.csv
+Page Number: 437
+Code Snippet: 0/1 knapsack problem
+
+-------------------------
+
+Cosine Similarity Scores on queries 
+Overlap = 2
+
+Query: "multi-level feedback queue (MLFQ) scheduler"
+
+Top Result:
+Score: 0.3562
+Source: algorithm-design-manual_embeddings.csv
+Page Number: 569
+Code Snippet: Feedback Edge/Vertex Set
+
+-------------------------
+
+Cosine Similarity Scores on queries 
+Overlap = 2
+
+Query: "Lock With Queues, Test-and-set, Yield, And Wakeup"
+
+Top Result:
+Score: 0.3299
+Source: algorithm-design-manual_embeddings.csv
+Page Number: 467
+Code Snippet: , of the partition, while the growth condition ensures that the blocks are
+
+-------------------------
+
+Cosine Similarity Scores on queries 
+Overlap = 2
+
+Query: "Write code to create a counter without locks"
+Top Result:
+Score: 0.3143
+Source: algorithm-design-manual_embeddings.csv
+Page Number: 594
+Code Snippet: , because the inside/outside test reduces to verifying
+
+-------------------------
+
+Cosine Similarity Scores on queries 
+Overlap = 2
+
+Query: "Priority Queue"
+
+Top Result:
+Score: 0.5138
+Source: algorithm-design-manual_embeddings.csv
+Page Number: 122
+Code Snippet: while in a
+item_type q[PQ_SIZE+1];
+int n;
+}
+priority_queue;
+
+-------------------------
+
+Cosine Similarity Scores on queries 
+Overlap = 2
+
+Query: "Prim's Algorithm"
+
+Top Result:
+Score: 0.3540
+Source: algorithm-design-manual_embeddings.csv
+Page Number: 45
+Code Snippet: Problem Size
+Best Case
+Average Case
+Worst  Case
+of Steps
+Number
+
+-------------------------
+
+Cosine Similarity Scores on queries 
+Overlap = 2
+
+Query: "Detect cycles using DFS"
+
+Top Result:
+Score: 0.4143
+Source: algorithm-design-manual_embeddings.csv
+Page Number: 337
+Code Snippet: = (
+if there are no edges (
+
+-------------------------
+
+Cosine Similarity Scores on queries 
+Overlap = 2
+
+Query: "solve the fractional knapsack problem"
+
+Top Result:
+Score: 0.3881
+Source: algorithm-design-manual_embeddings.csv
+Page Number: 605
+Code Snippet: Even the most elementary-sounding bin-packing problems are NP-complete;
+
+-------------------------
+
+Cosine Similarity Scores on queries 
+Overlap = 2
+
+Query: "multi-level feedback queue (MLFQ) scheduler"
+
+Top Result:
+Score: 0.3331
+Source: algorithm-design-manual_embeddings.csv
+Page Number: 122
+Code Snippet: while in a
+item_type q[PQ_SIZE+1];
+int n;
+}
+priority_queue;
+
+-------------------------
+
+Cosine Similarity Scores on queries 
+Overlap = 2
+
+Query: "Lock With Queues, Test-and-set, Yield, And Wakeup"
+
+Top Result:
+Score: 0.2713
+Source: algorithm-design-manual_embeddings.csv
+Page Number: 174
+Code Snippet: }
+=
+{
+}
+while
+=
+= dequeue[
+if
+
+-------------------------
+
+Cosine Similarity Scores on queries 
+Overlap = 2
+
+Query: "Write code to create a counter without locks"
+Top Result:
+Score: 0.2642
+Source: algorithm-design-manual_embeddings.csv
+Page Number: 18
+Code Snippet: =
+= 0
+=
+
+-------------------------
+

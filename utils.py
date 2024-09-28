@@ -28,15 +28,17 @@ def is_code_snippet(text, font):
     A simple function to detect code snippets based on indentation,
     common keywords, and short lines (which may indicate pseudocode).
     """
-    code_keywords = ['/', '>', '{', '}', '#', 'void', 'str', 'while', 'if', 'return', 'def', 'accept', 'delete', 'class', 'int', 'float', 'bool', 'end', '=']
+    code_keywords = ['/', '>', '{', '}', '#', 'void', 'str', 'while', 'if', 'return', 'def', 'accept', 'delete', 'int', 'float', 'bool', 'end']
 
     if text.startswith('    '):
         return True
     first_word = text.split()[0] if text.strip() else ""
     if first_word in code_keywords:
         return True
+    """
     if text.endswith(';'):
         return True
+    """
     if "courier" in font.lower() or "mono" in font.lower():
         return True
     """
