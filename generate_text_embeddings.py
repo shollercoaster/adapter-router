@@ -20,24 +20,31 @@ process_pdf_for_embeddings(
     num_sentence_chunk_size=8, 
     min_token_length=40,
 )
-'''
+
+# Embeddings for Python Tutorial
+process_pdf_for_embeddings(
+    file_path_name="python-tutorial", 
+    start_page=8, 
+    end_page=114,
+    num_sentence_chunk_size=4, 
+    min_token_length=30,
+)
+
 # Embeddings for Neural Network Foundations
 process_pdf_for_embeddings(
-    pdf_path="data/neural-network-learning-theoretical-foundations.pdf", 
+    file_path_name="neural-network-learning-theoretical-foundations", 
     start_page=15, 
     end_page=370,
     num_sentence_chunk_size=8, 
     min_token_length=30, 
-    output_path="neural_network_text_chunks_and_embeddings.csv"
 )
 
 # Embeddings for Cognitive Science Foundations 
 process_pdf_for_embeddings(
-    pdf_path="data/mind-body-world-cog-sci.pdf", 
+    file_path_name="mind-body-world-cog-sci", 
     start_page=16, 
     end_page=440,
     num_sentence_chunk_size=8, 
     min_token_length=40,
-    output_path="cog_sci_foundations_text_chunks_and_embeddings.csv"
 )
-'''
+

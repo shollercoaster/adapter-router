@@ -225,6 +225,8 @@ def calculate_page_statistics(pages_and_texts: list[dict], code_snippets: list[d
     Returns:
         pd.DataFrame: A DataFrame with the token and sentence statistics.
     """
+    # print(pages_and_texts)
+    # print(code_snippets)
     # Convert list of dicts to a DataFrame
     df = pd.DataFrame(pages_and_texts)
     code_df = pd.DataFrame(code_snippets)
@@ -238,8 +240,8 @@ def calculate_page_statistics(pages_and_texts: list[dict], code_snippets: list[d
     min_sentence_count = df["page_sentence_count_raw"].min()
 
     # Print text and code in a single page
-    print(df[0]["text"])
-    print(df[0]["code"])
+    print(df["text"][0])
+    print(code_df["code"][0])
 
     # Print statistics
     print(f"Average Token Count per Page: {avg_token_count:.2f}")
@@ -252,5 +254,6 @@ def calculate_page_statistics(pages_and_texts: list[dict], code_snippets: list[d
 
 ### Testing Code
 
-# code_snippets, pages_and_texts = open_and_read_pdf("data/algorithm-design-manual.pdf", start_page=120, end_page=124, header_height=60, footer_height=50)
-# df = calculate_page_statistics(pages_and_texts)
+code_snippets, text_per_page = open_and_read_pdf("data/operating-systems-three-easy-pieces.pdf", start_page=38, end_page=50, header_height=70, footer_height=100)
+pages_and_texts, pages_and_code = text_and_code_to_dataframe(text_per_page, code_snippets)
+df = calculate_page_statistics(pages_and_texts,  pages_and_code)
