@@ -20,10 +20,10 @@ device = torch.device("cuda")
 code_embedding_model = UniXcoder("microsoft/unixcoder-base")
 code_embedding_model.to(device)
 
-"""
-Extract embeddings from a code snippet or a natural language query.
-"""
-def get_single_code_embedding(text):
+def get_single_code_embedding(text: str) -> list:
+    """
+    Extract embeddings from a code snippet or a natural language query.
+    """
     tokens_ids = code_embedding_model.tokenize([text],max_length=512,mode="<encoder-only>")
     source_ids = torch.tensor(tokens_ids).to(device)
     tokens_embeddings, nl_embedding = code_embedding_model(source_ids)
@@ -42,7 +42,6 @@ def is_code_snippet(text, font):
     """
     code_keywords = ['>', '{', '}', '#', 'void', 'str', 'for', 'while', 'if', 'return', 'def', 'accept', 'delete', 'class', 'int', 'float', 'bool', 'end', '=']
 
-    # Check for indentation or common code keywords
     if text.startswith('    '):
         return True
     if any(text.lower().startswith(keyword) for keyword in code_keywords):
@@ -59,6 +58,7 @@ def is_code_snippet(text, font):
     return False
 
 def open_and_read_pdf(pdf_path: str, start_page: int, end_page: int, header_height: int, footer_height: int) -> tuple:
+    """Opens PDF document and extracts text and code segments per page."""
     doc = fitz.open(pdf_path)  # Open the PDF document
     text_per_page = defaultdict(list)
     code_snippets = dict()
@@ -101,11 +101,12 @@ def open_and_read_pdf(pdf_path: str, start_page: int, end_page: int, header_heig
 
     return code_snippets, text_per_page
 
-def text_to_dataframe(text_per_page: dict[list], code_snippets: dict) -> list[dict]:
+def text_and_code_to_dataframe(text_per_page: dict[list], code_snippets: dict) -> tuple:
     """
     Takes individual chunks from each page and creates a dictionary with relevant statistics
     """
     pages_and_texts = []
+    pages_and_code = []
 
     for page_num in text_per_page:
         text = ''.join(text_per_page[page_num])
@@ -120,9 +121,12 @@ def text_to_dataframe(text_per_page: dict[list], code_snippets: dict) -> list[di
         
         # add code snippet for corresponding page
         if page_num in code_snippets:
-            pages_and_texts[-1]['code'] = code_snippets[page_num]
+            pages_and_code.append({
+                "page_number": page_num + 1,
+                "code": code_snippets # storing the code snippet without formatting, a separate experiment could embed the code with formatting and check results
+            })
 
-    return pages_and_texts
+    return pages_and_texts, pages_and_code
 
 def sentence_chunking(pages_and_texts: list[dict]) -> None:
     """
@@ -135,7 +139,7 @@ def sentence_chunking(pages_and_texts: list[dict]) -> None:
         doc = nlp(item["text"])  # Apply NLP pipeline to extract sentences
         item["sentences"] = [str(sent) for sent in doc.sents]  # Convert sentences to strings
 
-def split_list(input_list: list, chunk_size: int, overlap: int = 0) -> list[list[str]]:
+def split_list(input_list: list, chunk_size: int, overlap: int = 2) -> list[list[str]]:
     """
     Splits a list into smaller sublists of a given size.
     Parameters:
@@ -182,10 +186,6 @@ def merge_and_filter_chunks(pages_and_texts: list[dict], num_sentence_chunk_size
                 "chunk_token_count": len(chunk_text) / 4  # Approximate 1 token as 4 characters
             }
 
-            if item["code"]: 
-                chunk_info["code"] = item["code"]
-#                chunk_info["code_embeddings"] = item["code_embeddings"]
-
             if chunk_info["chunk_token_count"] > min_token_length:  # Filter out chunks that are too small
                 pages_and_chunks.append(chunk_info)
 
@@ -208,24 +208,22 @@ def embed_chunks(pages_and_chunks: list[dict]) -> None:
     
     print(f"[INFO] Time taken to generate document embeddings: {end_time-start_time:.5f} seconds.")
 
-def create_code_embeddings(pages_and_chunks: list[dict]) -> None:
+def create_code_embeddings(pages_and_code: list[dict]) -> None:
     """
     Generates embeddings for each code snippet.
-    
     Parameters:
         pages_and_chunks (list[dict]): List of text chunks for embedding.
         code_snippets (dict): List of code snippets read page-wise.
     """
     start_time = time.time()
 
-    for item in tqdm(pages_and_chunks):
-        if not item['code']: continue
-        else: item['code_embeddings'] = get_single_code_embedding(item['code'])
+    for item in tqdm(pages_and_code):
+        item['code_embeddings'] = get_single_code_embedding(item['code'])
 
     end_time = time.time()
-    print(f"[INFO] Time taken to generate document code embeddings: {end_time-start_time:.5f} seconds.")
+    print(f"[INFO] Time taken to generate code embeddings: {end_time-start_time:.5f} seconds.")
 
-def process_pdf_for_embeddings(pdf_path: str, start_page: int, end_page: int, num_sentence_chunk_size: int, min_token_length: int, output_path: str, header_height: int=50, footer_height: int=60) -> None:
+def process_pdf_for_embeddings(file_path_name: str, start_page: int, end_page: int, num_sentence_chunk_size: int, min_token_length: int, header_height: int=50, footer_height: int=60) -> None:
     """
     Automates the process of extracting text from a PDF, chunking sentences, generating embeddings, and saving results to a CSV.
     
@@ -237,24 +235,28 @@ def process_pdf_for_embeddings(pdf_path: str, start_page: int, end_page: int, nu
         min_token_length (int): Minimum token count for valid chunks.
         output_file (str): Path to the CSV file for saving results.
     """
+    pdf_path = "data/" + file_path_name + ".pdf"
+    output_path = file_path_name + "_embeddings.csv"
     code_snippets, text_per_page = open_and_read_pdf(pdf_path, start_page, end_page, header_height, footer_height) # Extract text from PDF
-    pages_and_texts = text_to_dataframe(text_per_page, code_snippets)  # Create dataframe for text
-#    create_code_embeddings(pages_and_texts) # Create code database
+    pages_and_texts, pages_and_code = text_and_code_to_dataframe(text_per_page, code_snippets)  # Create dataframe for text
+
     sentence_chunking(pages_and_texts)  # Split text into sentences
     pages_and_chunks = merge_and_filter_chunks(pages_and_texts, num_sentence_chunk_size, min_token_length)  # Create and filter chunks
-    create_code_embeddings(pages_and_chunks) # Create code database
-    embed_chunks(pages_and_chunks)  # Generate embeddings for each chunk
+    embed_chunks(pages_and_chunks)  # Generate text embeddings for each chunk
 
-    # Save the final embeddings to a CSV file
+    # Save the final text embeddings to a CSV file
     df = pd.DataFrame(pages_and_chunks)
-    df.to_csv("embeddings/" + str(output_path), index=False)
+    df.to_csv("embeddings/text/" + str(output_path), index=False)
+    print(f"Embeddings saved to embeddings/text/{output_path}")
 
-    # code_df = pd.DataFrame(code_database)
-    # code_df.to_csv("embeddings/code/" + str(output_path), index=False)
-    print(f"Embeddings saved to {output_path}")
+    create_code_embeddings(pages_and_code) # Create code database
+
+    code_df = pd.DataFrame(pages_and_code)
+    code_df.to_csv("embeddings/code/" + str(output_path), index=False)
+    print(f"Embeddings saved to embeddings/code/{output_path}")
 
 # Statistical Analysis 
-def calculate_page_statistics(pages_and_texts: list[dict]) -> pd.DataFrame:
+def calculate_page_statistics(pages_and_texts: list[dict], code_snippets: list[dict]) -> pd.DataFrame:
     """
     Converts the list of page dictionaries to a DataFrame and calculates
     average and minimum token and sentence counts across all pages.
@@ -267,6 +269,7 @@ def calculate_page_statistics(pages_and_texts: list[dict]) -> pd.DataFrame:
     """
     # Convert list of dicts to a DataFrame
     df = pd.DataFrame(pages_and_texts)
+    code_df = pd.DataFrame(code_snippets)
     
     # Calculate average and minimum token count
     avg_token_count = df["page_token_count"].mean()
@@ -276,6 +279,10 @@ def calculate_page_statistics(pages_and_texts: list[dict]) -> pd.DataFrame:
     avg_sentence_count = df["page_sentence_count_raw"].mean()
     min_sentence_count = df["page_sentence_count_raw"].min()
 
+    # Print text and code in a single page
+    print(df[0]["text"])
+    print(df[0]["code"])
+
     # Print statistics
     print(f"Average Token Count per Page: {avg_token_count:.2f}")
     print(f"Minimum Token Count per Page: {min_token_count}")
@@ -284,17 +291,8 @@ def calculate_page_statistics(pages_and_texts: list[dict]) -> pd.DataFrame:
 
     return df
 
+
 ### Testing Code
 
 # code_snippets, pages_and_texts = open_and_read_pdf("data/algorithm-design-manual.pdf", start_page=120, end_page=124, header_height=60, footer_height=50)
 # df = calculate_page_statistics(pages_and_texts)
-
-# Embeddings for Algorithm Design Manual
-# process_pdf_for_embeddings(
-#     pdf_path="data/algorithm-design-manual.pdf", 
-#     start_page=120, 
-#     end_page=124,
-#     num_sentence_chunk_size=8, 
-#     min_token_length=40,
-#     output_path="test_embeddings.csv"
-# )
