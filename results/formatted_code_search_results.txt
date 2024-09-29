@@ -1,0 +1,239 @@
+Cosine Similarity Scores on queries 
+Overlap = 2
+
+Query: "Priority Queue"
+
+Top Result:
+Score: 0.5231
+Source: algorithm-design-manual_embeddings.csv
+Page Number: 122
+Code Snippet: while in a
+item_type q[PQ_SIZE+1];
+int n;
+}
+priority_queue;
+
+-------------------------
+
+Cosine Similarity Scores on queries 
+Overlap = 2
+
+Query: "Prim's Algorithm"
+
+Top Result:
+Score: 0.3540
+Source: algorithm-design-manual_embeddings.csv
+Page Number: 45
+Code Snippet: Problem Size
+Best Case
+Average Case
+Worst  Case
+of Steps
+Number
+
+-------------------------
+
+Cosine Similarity Scores on queries 
+Overlap = 2
+
+Query: "Detect cycles using DFS"
+
+Top Result:
+Score: 0.4197
+Source: algorithm-design-manual_embeddings.csv
+Page Number: 193
+Code Snippet: {
+    int i;
+    init_stack(&sorted);
+    if (discovered[i] == FALSE)
+dfs(g,i);
+    print_stack(&sorted);
+}
+if there is a directed
+= (
+= (
+
+-------------------------
+
+Cosine Similarity Scores on queries 
+Overlap = 2
+
+Query: "solve the fractional knapsack problem"
+
+Top Result:
+Score: 0.3881
+Source: algorithm-design-manual_embeddings.csv
+Page Number: 605
+Code Snippet: Even the most elementary-sounding bin-packing problems are NP-complete;
+
+-------------------------
+
+Cosine Similarity Scores on queries 
+Overlap = 2
+
+Query: "multi-level feedback queue (MLFQ) scheduler"
+
+Top Result:
+Score: 0.3354
+Source: algorithm-design-manual_embeddings.csv
+Page Number: 122
+Code Snippet: while in a
+item_type q[PQ_SIZE+1];
+int n;
+}
+priority_queue;
+
+-------------------------
+
+Cosine Similarity Scores on queries 
+Overlap = 2
+
+Query: "Lock With Queues, Test-and-set, Yield, And Wakeup"
+
+Top Result:
+Score: 0.2713
+Source: algorithm-design-manual_embeddings.csv
+Page Number: 174
+Code Snippet: }
+=
+{
+}
+while
+=
+= dequeue[
+if
+
+-------------------------
+
+Cosine Similarity Scores on queries 
+Overlap = 2
+
+Query: "Write code to create a counter without locks"
+Top Result:
+Score: 0.2642
+Source: algorithm-design-manual_embeddings.csv
+Page Number: 18
+Code Snippet: =
+= 0
+=
+
+-------------------------
+
+Cosine Similarity Scores on queries 
+Overlap = 2
+
+Query: "Priority Queue"
+
+Top Result:
+Score: 0.5231
+Source: algorithm-design-manual_embeddings.csv
+Page Number: 122
+Code Snippet: while in a
+item_type q[PQ_SIZE+1];
+int n;
+}
+priority_queue;
+
+-------------------------
+
+Cosine Similarity Scores on queries 
+Overlap = 2
+
+Query: "Prim's Algorithm"
+
+Top Result:
+Score: 0.3540
+Source: algorithm-design-manual_embeddings.csv
+Page Number: 45
+Code Snippet: Problem Size
+Best Case
+Average Case
+Worst  Case
+of Steps
+Number
+
+-------------------------
+
+Cosine Similarity Scores on queries 
+Overlap = 2
+
+Query: "Detect cycles using DFS"
+
+Top Result:
+Score: 0.4146
+Source: algorithm-design-manual_embeddings.csv
+Page Number: 192
+Code Snippet: {
+}
+{
+}
+{
+    push(&sorted,v);
+}
+{
+    int class;
+    class = edge_classification(x,y);
+    if (class == BACK)
+printf("Warning: directed cycle found, not a DAG\n");
+}
+
+-------------------------
+
+Cosine Similarity Scores on queries 
+Overlap = 2
+
+Query: "solve the fractional knapsack problem"
+
+Top Result:
+Score: 0.3881
+Source: algorithm-design-manual_embeddings.csv
+Page Number: 605
+Code Snippet: Even the most elementary-sounding bin-packing problems are NP-complete;
+
+-------------------------
+
+Cosine Similarity Scores on queries 
+Overlap = 2
+
+Query: "multi-level feedback queue (MLFQ) scheduler"
+
+Top Result:
+Score: 0.3354
+Source: algorithm-design-manual_embeddings.csv
+Page Number: 122
+Code Snippet: while in a
+item_type q[PQ_SIZE+1];
+int n;
+}
+priority_queue;
+
+-------------------------
+
+Cosine Similarity Scores on queries 
+Overlap = 2
+
+Query: "Lock With Queues, Test-and-set, Yield, And Wakeup"
+
+Top Result:
+Score: 0.2420
+Source: algorithm-design-manual_embeddings.csv
+Page Number: 89
+Code Snippet: while
+> x
+
+-------------------------
+
+Cosine Similarity Scores on queries 
+Overlap = 2
+
+Query: "Write code to create a counter without locks"
+Top Result:
+Score: 0.2611
+Source: algorithm-design-manual_embeddings.csv
+Page Number: 238
+Code Snippet: {
+}
+if every cycle of
+
+-------------------------
+
